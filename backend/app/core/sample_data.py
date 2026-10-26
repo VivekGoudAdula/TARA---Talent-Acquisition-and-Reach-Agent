@@ -40,37 +40,54 @@ def pick_language(city: str) -> str:
 
 
 def get_default_products(tenant_id: str) -> list[dict]:
-    """Generate default 3 financial products for a tenant."""
+    """Generate default 3 financial products for a tenant with canonical categories."""
     return [
         {
             "tenant_id": str(tenant_id),
             "name": "Personal Loan",
-            "category": "lending",
+            "category": "personal_loan",
             "description": "Unsecured personal loan up to ₹10L at competitive rates",
             "active": True,
-            "eligibility_rules": {"min_income": 25000, "min_age": 21, "max_age": 60},
+            "eligibility_rules": {
+                "min_income": 25000,
+                "min_age": 21,
+                "max_age": 60,
+                "max_emi_to_income": 0.50,
+            },
         },
         {
             "tenant_id": str(tenant_id),
             "name": "Credit Card",
-            "category": "cards",
+            "category": "credit_card",
             "description": "Premium rewards credit card with dining and travel benefits",
             "active": True,
-            "eligibility_rules": {"min_income": 30000, "min_age": 21, "max_age": 65},
+            "eligibility_rules": {
+                "min_income": 30000,
+                "min_age": 21,
+                "max_age": 65,
+                "allowed_repayment_behaviours": ["GOOD", "AVERAGE"],
+                "exclude_if_holds_product": True,
+            },
         },
         {
             "tenant_id": str(tenant_id),
             "name": "Home Loan",
-            "category": "mortgage",
+            "category": "home_loan",
             "description": "Affordable housing finance with long-term tenure up to 30 years",
             "active": True,
-            "eligibility_rules": {"min_income": 60000, "min_age": 25, "max_age": 65},
+            "eligibility_rules": {
+                "min_income": 60000,
+                "min_age": 25,
+                "max_age": 65,
+                "min_financial_health": 65,
+                "max_emi_to_income": 0.60,
+            },
         },
     ]
 
 
 def generate_sample_leads(tenant_id: str, count: int = 40, verified_phones: list[str] | None = None) -> list[dict]:
-    """Generate realistic Indian leads with non-dialable phone numbers."""
+    """Generate realistic Indian leads with non-dialable phone numbers and model features."""
     leads = []
     verified_phones = verified_phones or []
     for i in range(1, count + 1):
@@ -88,6 +105,10 @@ def generate_sample_leads(tenant_id: str, count: int = 40, verified_phones: list
             consent = random.random() < 0.85
             dnd = random.random() < 0.08
 
+        # Model features
+        emp_type = random.choices(["salaried", "self_employed", "other"], weights=[0.70, 0.22, 0.08])[0]
+        emi_ratio = round(random.uniform(0.0, 0.55), 3)
+
         leads.append({
             "tenant_id": str(tenant_id),
             "name": name,
@@ -97,6 +118,8 @@ def generate_sample_leads(tenant_id: str, count: int = 40, verified_phones: list
             "age": random.randint(22, 60),
             "income": round(random.uniform(18000, 180000), 2),
             "segment": random.choice(SEGMENTS),
+            "employment_type": emp_type,
+            "existing_emi_to_income": emi_ratio,
             "consent": consent,
             "dnd": dnd,
             "source": random.choice(SOURCES),
@@ -107,7 +130,7 @@ def generate_sample_leads(tenant_id: str, count: int = 40, verified_phones: list
 
 
 def generate_sample_customers(tenant_id: str, count: int = 20) -> list[dict]:
-    """Generate realistic existing bank customers with financial metrics."""
+    """Generate realistic existing bank customers with financial metrics and model features."""
     customers = []
     for i in range(101, 101 + count):
         city = random.choice(CITIES)
@@ -116,6 +139,9 @@ def generate_sample_customers(tenant_id: str, count: int = 20) -> list[dict]:
         phone = f"+9190000{str(i).zfill(5)}"
         consent = random.random() < 0.90
         dnd = random.random() < 0.05
+
+        emp_type = random.choices(["salaried", "self_employed", "other"], weights=[0.72, 0.20, 0.08])[0]
+        emi_ratio = round(random.uniform(0.0, 0.50), 3)
 
         customers.append({
             "tenant_id": str(tenant_id),
@@ -126,6 +152,9 @@ def generate_sample_customers(tenant_id: str, count: int = 20) -> list[dict]:
             "age": random.randint(24, 65),
             "income": round(random.uniform(25000, 220000), 2),
             "segment": random.choice(SEGMENTS),
+            "employment_type": emp_type,
+            "existing_emi_to_income": emi_ratio,
+            "tenure_months": random.randint(6, 120),
             "consent": consent,
             "dnd": dnd,
             "source": "crm_import",

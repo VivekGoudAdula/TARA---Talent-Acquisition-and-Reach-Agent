@@ -19,12 +19,13 @@ def get_db() -> AsyncIOMotorDatabase:
     return db
 
 
-async def init_db() -> None:
+async def init_db(db_name: str | None = None) -> None:
     """Initialize MongoDB client and create necessary indexes."""
     global client, db
     logger.info("Connecting to MongoDB at %s", settings.mongo_uri.split("@")[-1])
     client = AsyncIOMotorClient(settings.mongo_uri)
-    db = client[settings.mongo_db_name]
+    target_db = db_name or settings.mongo_db_name
+    db = client[target_db]
 
     # Verify connection
     await client.admin.command("ping")
@@ -44,7 +45,29 @@ async def init_db() -> None:
     await db.customers.create_index([("tenant_id", 1), ("dnd", 1)])
 
     await db.products.create_index([("tenant_id", 1), ("active", 1)])
-    logger.info("MongoDB initialized and indexes verified successfully.")
+
+    # Communications and Webhook indexes
+    await db.communications.create_index([("tenant_id", 1), ("recipient_id", 1), ("created_at", -1)])
+    await db.communications.create_index([("tenant_id", 1), ("status", 1)])
+    await db.communications.create_index([("provider_ref", 1)], sparse=True)
+    await db.communications.create_index(
+        [("tenant_id", 1), ("idempotency_key", 1)],
+        unique=True,
+        partialFilterExpression={"idempotency_key": {"$type": "string"}},
+    )
+    await db.webhook_events.create_index([("provider_ref", 1)])
+
+    # Scoring and Product Matching indexes
+    await db.scoring_runs.create_index([("tenant_id", 1), ("created_at", -1)])
+    await db.product_matches.create_index([
+        ("tenant_id", 1), ("entity_type", 1), ("product_id", 1), ("is_latest", 1), ("band", 1)
+    ])
+    await db.product_matches.create_index([("tenant_id", 1), ("entity_id", 1), ("is_latest", 1)])
+    await db.product_matches.create_index(
+        [("scoring_run_id", 1), ("entity_id", 1), ("product_id", 1)],
+        unique=True,
+    )
+    logger.info("MongoDB initialized with database '%s' and indexes verified.", target_db)
 
 
 async def close_db() -> None:

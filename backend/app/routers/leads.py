@@ -11,6 +11,7 @@ from app.core.deps import get_current_user
 from app.core.security import mask_phone
 from app.schemas.common import PaginatedResponse, PaginationMeta
 from app.schemas.lead import LeadResponse
+from app.schemas.scoring import ProductMatchDetail
 
 logger = logging.getLogger("tara.leads")
 router = APIRouter(prefix="/leads", tags=["leads"])
@@ -95,3 +96,36 @@ async def get_lead(
 
     logger.debug("Lead fetched: %s with phone %s", lead_id, mask_phone(doc.get("phone")))
     return LeadResponse(**doc_to_dict(doc))
+
+
+@router.get("/{lead_id}/matches", response_model=list[ProductMatchDetail])
+async def get_lead_matches(
+    lead_id: str,
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> list[ProductMatchDetail]:
+    """Retrieve all latest product matches for a lead sorted by match_score desc."""
+    db = get_db()
+    id_matcher: Any = lead_id
+    if ObjectId.is_valid(lead_id):
+        id_matcher = {"$in": [lead_id, ObjectId(lead_id)]}
+
+    lead_query = build_tenant_query(current_user["tenant_id"], {"_id": id_matcher})
+    lead = await db.leads.find_one(lead_query)
+    if not lead:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lead not found")
+
+    matches_query = build_tenant_query(
+        current_user["tenant_id"],
+        {"entity_id": str(lead["_id"]), "is_latest": True},
+    )
+    cursor = db.product_matches.find(matches_query).sort("match_score", -1)
+    results = []
+    async for doc in cursor:
+        d = doc_to_dict(doc)
+        d["entity_name"] = lead.get("name")
+        d["entity_language"] = lead.get("language")
+        d["entity_city"] = lead.get("city")
+        d["consent"] = lead.get("consent")
+        d["dnd"] = lead.get("dnd")
+        results.append(ProductMatchDetail(**d))
+    return results

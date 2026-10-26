@@ -9,6 +9,8 @@ import Signup from "./pages/Signup";
 import Leads from "./pages/Leads";
 import Customers from "./pages/Customers";
 import Products from "./pages/Products";
+import ProductMatches from "./pages/ProductMatches";
+import Models from "./pages/Models";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -31,7 +33,9 @@ export default function App() {
               <Route index element={<Navigate to="/app/leads" replace />} />
               <Route path="leads" element={<Leads />} />
               <Route path="customers" element={<Customers />} />
+              <Route path="matches" element={<ProductMatches />} />
               <Route path="products" element={<Products />} />
+              <Route path="models" element={<Models />} />
             </Route>
           </Route>
 

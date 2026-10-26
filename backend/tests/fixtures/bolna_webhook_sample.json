@@ -1,0 +1,21 @@
+{
+  "_comment": "PLACEHOLDER GUESS: This is an assumed mock payload structure for Bolna webhooks. It is NOT real production data and will be adjusted once a real payload is inspected.",
+  "execution_id": "exec_bolna_sample_mock_12345",
+  "status": "completed",
+  "recipient_phone_number": "+919876543210",
+  "hangup_reason": "customer_hangup",
+  "duration": 48.5,
+  "transcript": "Agent: Namaste, this is TARA calling from Test Bank regarding a pre-approved personal loan. Lead: Yes, please tell me more.",
+  "extracted_data": {
+    "interest_level": "HIGH",
+    "preferred_amount": 500000,
+    "preferred_callback_time": "Tomorrow 3 PM",
+    "language_used": "telugu"
+  },
+  "cost": 0.42,
+  "latency": {
+    "avg_turn_ms": 650,
+    "tts_ms": 220,
+    "llm_ms": 380
+  }
+}

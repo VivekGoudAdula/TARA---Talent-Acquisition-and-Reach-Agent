@@ -6,6 +6,7 @@ import DataTable from "../components/DataTable";
 import Badge from "../components/Badge";
 import Button from "../components/Button";
 import Modal from "../components/Modal";
+import ProductMatchesSection from "../components/ProductMatchesSection";
 import {
   formatCurrency,
   formatLanguage,
@@ -332,6 +333,9 @@ export default function Leads() {
                 </div>
               </div>
             </div>
+
+            {/* Product Fit & Policy Eligibility Section */}
+            <ProductMatchesSection entityType="lead" entityId={selectedLead.id} />
           </div>
         )}
       </Modal>

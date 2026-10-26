@@ -69,14 +69,20 @@ async def health_check() -> dict[str, str]:
         )
 
 
+from app.routers.communication import router as communication_router
+from app.routers.scoring import router as scoring_router
+from app.routers.webhooks import router as webhooks_router
 from app.routers.workspace import router as workspace_router
 
-# Register tenant-scoped API routers
+# Register tenant-scoped and public webhook API routers
 app.include_router(auth_router, prefix="/api")
 app.include_router(leads_router, prefix="/api")
 app.include_router(customers_router, prefix="/api")
 app.include_router(products_router, prefix="/api")
+app.include_router(scoring_router, prefix="/api")
 app.include_router(workspace_router, prefix="/api")
+app.include_router(communication_router, prefix="/api")
+app.include_router(webhooks_router, prefix="/api")
 
 
 

@@ -94,3 +94,19 @@ def require_role(allowed_role: str):
         return current_user
 
     return role_checker
+
+
+def require_roles(allowed_roles: list[str]):
+    """Dependency factory restricting access to any of the specified roles."""
+
+    async def roles_checker(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+        user_role = current_user.get("role")
+        if user_role not in allowed_roles and user_role != "SUPER_ADMIN":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Action requires one of {allowed_roles} privileges",
+            )
+        return current_user
+
+    return roles_checker
+

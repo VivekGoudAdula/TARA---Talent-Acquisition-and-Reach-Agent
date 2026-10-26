@@ -10,6 +10,8 @@ import {
   Building2,
   Menu,
   X,
+  Sparkles,
+  Cpu,
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { formatRole } from "../utils/format";
@@ -29,7 +31,9 @@ export default function Layout() {
   const navItems = [
     { name: "Leads", path: "/app/leads", icon: Users },
     { name: "Customers", path: "/app/customers", icon: UserCheck },
+    { name: "Product Matches", path: "/app/matches", icon: Sparkles },
     { name: "Products", path: "/app/products", icon: Package },
+    { name: "Models", path: "/app/models", icon: Cpu },
   ];
 
   const disabledNavItems = [

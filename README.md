@@ -102,10 +102,10 @@ npm run dev
 
 ## Running Automated Tests
 
-Run the full isolation, signup, and sample data test suite:
+Run the full isolation, signup, sample data, and communication test suites:
 ```bash
 cd backend
-python -m pytest tests/test_tenant_isolation.py -v
+python -m pytest -v
 ```
 
 ### Verified Test Cases:
@@ -115,3 +115,47 @@ python -m pytest tests/test_tenant_isolation.py -v
 4. `test_signup_validation`: Duplicate email returns `409`; passwords under 10 characters return `422`.
 5. `test_rate_limiting`: Exceeding 10 requests per minute per IP returns `429 Too Many Requests`.
 6. `test_sample_data_loading`: Sample data loads for `SUPER_ADMIN`, returns `403` for `EMPLOYEE`, returns `409` on subsequent calls.
+7. `test_communication`: Full Phase 2 test suite covering dispatch, 7 compliance rules, mock Bolna transport, idempotency, monotonic webhooks, out-of-order reconciliation, and provider error handling.
+
+---
+
+## Phase 2: Bolna Voice Agent & Webhook Setup
+
+### 1. Exposing Local Backend with a Tunnel
+To allow Bolna to deliver webhook callbacks to your local development environment, expose port 8000 using Cloudflare Tunnel or ngrok:
+
+**Using Cloudflare Tunnel (cloudflared):**
+```bash
+cloudflared tunnel --url http://localhost:8000
+```
+
+**Using ngrok:**
+```bash
+ngrok http 8000
+```
+
+Copy the generated public HTTPS URL (e.g., `https://abc-123.trycloudflare.com`) and update `backend/.env`:
+```env
+PUBLIC_BASE_URL=https://abc-123.trycloudflare.com
+```
+
+### 2. Bolna Agent Webhook Configuration
+In your Bolna Dashboard (`https://platform.bolna.ai`):
+1. Navigate to your Agent -> **Extractions** / **Webhook** tab.
+2. Configure **Webhook URL**:
+   ```
+   https://<your-public-tunnel-domain>/api/webhooks/bolna
+   ```
+   (e.g., `https://abc-123.trycloudflare.com/api/webhooks/bolna`)
+3. Under **Add Headers**, configure:
+   - Header Key: `X-Webhook-Secret`
+   - Header Value: `<value of BOLNA_WEBHOOK_SECRET from your backend/.env>`
+
+### 3. Running Guarded Manual Test Calls
+Before running a live test call, ensure `TEST_MODE=true` and your verified phone number is set in `TEST_ALLOWLIST` in `backend/.env`.
+```bash
+cd backend
+python scripts/manual_test_call.py
+```
+This script will authenticate as `employee@testbank.com`, pick the allowlisted lead, trigger `POST /api/communication/send`, and poll `GET /api/communications/{id}` for live outcome updates.
+

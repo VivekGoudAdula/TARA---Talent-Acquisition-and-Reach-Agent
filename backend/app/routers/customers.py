@@ -11,6 +11,7 @@ from app.core.deps import get_current_user
 from app.core.security import mask_phone
 from app.schemas.common import PaginatedResponse, PaginationMeta
 from app.schemas.customer import CustomerResponse
+from app.schemas.scoring import ProductMatchDetail
 
 logger = logging.getLogger("tara.customers")
 router = APIRouter(prefix="/customers", tags=["customers"])
@@ -95,3 +96,36 @@ async def get_customer(
 
     logger.debug("Customer fetched: %s with phone %s", customer_id, mask_phone(doc.get("phone")))
     return CustomerResponse(**doc_to_dict(doc))
+
+
+@router.get("/{customer_id}/matches", response_model=list[ProductMatchDetail])
+async def get_customer_matches(
+    customer_id: str,
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> list[ProductMatchDetail]:
+    """Retrieve all latest product matches for a customer sorted by match_score desc."""
+    db = get_db()
+    id_matcher: Any = customer_id
+    if ObjectId.is_valid(customer_id):
+        id_matcher = {"$in": [customer_id, ObjectId(customer_id)]}
+
+    cust_query = build_tenant_query(current_user["tenant_id"], {"_id": id_matcher})
+    customer = await db.customers.find_one(cust_query)
+    if not customer:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
+
+    matches_query = build_tenant_query(
+        current_user["tenant_id"],
+        {"entity_id": str(customer["_id"]), "is_latest": True},
+    )
+    cursor = db.product_matches.find(matches_query).sort("match_score", -1)
+    results = []
+    async for doc in cursor:
+        d = doc_to_dict(doc)
+        d["entity_name"] = customer.get("name")
+        d["entity_language"] = customer.get("language")
+        d["entity_city"] = customer.get("city")
+        d["consent"] = customer.get("consent")
+        d["dnd"] = customer.get("dnd")
+        results.append(ProductMatchDetail(**d))
+    return results
