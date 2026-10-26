@@ -27,10 +27,12 @@ async def sync():
         tid = str(t["_id"])
         tname = t.get("name", "Unknown")
 
-        # 1. Check if Test User 1 exists
+        # 1. Update any existing Test User 1 to Vivek Goud
+        await db.leads.update_many({"tenant_id": tid, "name": "Test User 1"}, {"$set": {"name": "Vivek Goud", "phone": target_phone}})
+
         lead_doc = {
             "tenant_id": tid,
-            "name": "Test User 1",
+            "name": "Vivek Goud",
             "phone": target_phone,
             "language": "telugu",
             "city": "Hyderabad",
@@ -45,13 +47,13 @@ async def sync():
             "attributes": {},
             "updated_at": now,
         }
-        existing = await db.leads.find_one({"tenant_id": tid, "name": "Test User 1"})
+        existing = await db.leads.find_one({"tenant_id": tid, "$or": [{"name": "Vivek Goud"}, {"phone": target_phone}]})
         if existing:
             await db.leads.update_one({"_id": existing["_id"]}, {"$set": lead_doc})
         else:
             lead_doc["created_at"] = now
             await db.leads.insert_one(lead_doc)
-        print(f"[{tname}] Test User 1 ready with {target_phone}")
+        print(f"[{tname}] Vivek Goud ready with {target_phone}")
 
         # 2. Canonical categories for products
         cat_map = {"personal loan": "personal_loan", "credit card": "credit_card", "home loan": "home_loan"}
@@ -61,18 +63,19 @@ async def sync():
             if p.get("category") != cat:
                 await db.products.update_one({"_id": p["_id"]}, {"$set": {"category": cat, "updated_at": now}})
 
-        # 3. Generate matches
+        # 3. Generate matches with unique run id
         prods = await db.products.find({"tenant_id": tid, "active": True}).to_list(20)
         leads = await db.leads.find({"tenant_id": tid}).to_list(200)
         if prods and leads:
             await db.product_matches.update_many({"tenant_id": tid}, {"$set": {"is_latest": False}})
+            run_id = f"sync_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{tid[:6]}"
             matches = []
             for l in leads:
                 for p in prods:
                     res = score_entity_product(l, p, "lead")
                     matches.append({
                         "tenant_id": tid,
-                        "scoring_run_id": "sync_run",
+                        "scoring_run_id": run_id,
                         "is_latest": True,
                         "entity_type": "lead",
                         "entity_id": str(l["_id"]),

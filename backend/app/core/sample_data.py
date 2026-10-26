@@ -102,7 +102,7 @@ def generate_sample_leads(tenant_id: str, count: int = 40, verified_phones: list
 
         if i <= len(verified_phones):
             phone = verified_phones[i - 1]
-            name = f"Test User {i}"
+            name = "Vivek Goud" if i == 1 else f"Test User {i}"
             consent = True
             dnd = False
         else:
