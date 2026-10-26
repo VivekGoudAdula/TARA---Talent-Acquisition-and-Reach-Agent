@@ -62,7 +62,7 @@ def build_candidate_filter(
             score_crit["$gte"] = float(min_score)
         if max_score is not None:
             score_crit["$lte"] = float(max_score)
-        crit["score"] = score_crit
+        crit["match_score"] = score_crit
 
     return crit
 
@@ -130,7 +130,7 @@ async def get_audience_preview(
 
         candidates.append(AudienceCandidateItem(
             entity_id=eid, name=ename, phone_masked=mask_phone(ephone),
-            language=entity.get("language", "telugu"), band=band, match_score=float(m.get("score", 0.0)),
+            language=entity.get("language", "telugu"), band=band, match_score=float(m.get("match_score", m.get("score", 0.0))),
             eligibility=elig, consent=bool(entity.get("consent")), dnd=bool(entity.get("dnd")),
             already_selected=already_sel, will_be_blocked_reason=blocked_r, match_id=str(m["_id"]),
         ))
@@ -216,7 +216,7 @@ async def set_campaign_audience(
         docs.append({
             "campaign_id": cid, "tenant_id": tid, "entity_type": campaign["entity_type"], "entity_id": eid,
             "name": entity.get("name", "Unknown"), "language": entity.get("language", "telugu"),
-            "match_id": str(m["_id"]), "match_score": float(m.get("score", 0.0)), "band": m.get("band", "LOW"),
+            "match_id": str(m["_id"]), "match_score": float(m.get("match_score", m.get("score", 0.0))), "band": m.get("band", "LOW"),
             "eligibility": m.get("eligibility", "NOT_ELIGIBLE"), "status": "PENDING",
             "blocked_reason": None, "last_communication_id": None, "attempts": 0,
             "last_contact_at": None, "created_at": now_utc, "updated_at": now_utc,
