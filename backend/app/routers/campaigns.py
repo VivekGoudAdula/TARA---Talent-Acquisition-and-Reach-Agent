@@ -18,6 +18,7 @@ from app.services.campaign_audience import get_audience_preview, preview_blocked
 from app.services.campaign_configs import DEFAULT_VOICE_CONFIG, get_campaign_configs, save_campaign_config
 from app.services.campaign_variables import map_campaign_voice_variables, validate_voice_config
 from app.services.campaigns import get_campaign_progress, run_campaign_dispatch
+from app.services.compliance import is_fake_seeded_number
 
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
@@ -171,23 +172,48 @@ async def update_audience(
 @router.get("/{id}/recipients", response_model=PaginatedResponse[CampaignRecipientItem])
 async def list_recipients(
     id: str, status_filter: str | None = Query(None, alias="status"),
-    page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100),
+    page: int = Query(1, ge=1), page_size: int = Query(50, ge=1, le=100),
     user: dict[str, Any] = Depends(get_current_user),
 ) -> PaginatedResponse[CampaignRecipientItem]:
-    """List recipients inside a campaign with refreshed statuses."""
+    """List recipients inside a campaign with refreshed statuses and live entity names."""
     db, tid = get_db(), user["tenant_id"]
-    await resolve_campaign(db, tid, id)
+    camp = await resolve_campaign(db, tid, id)
     await get_campaign_progress(db, id, tid)
 
     crit: dict[str, Any] = {"campaign_id": id, "tenant_id": tid}
-    if status_filter:
+    if status_filter and isinstance(status_filter, str):
         crit["status"] = status_filter.upper().strip()
 
-    total = await db.campaign_recipients.count_documents(crit)
-    total_pages = math.ceil(total / page_size) if total > 0 else 0
-    cursor = db.campaign_recipients.find(crit).sort("created_at", -1).skip((page - 1) * page_size).limit(page_size)
+    cursor = db.campaign_recipients.find(crit)
+    raw_docs = await cursor.to_list(length=1000)
 
-    items = [CampaignRecipientItem(**doc_to_dict(doc)) async for doc in cursor]
+    # Batch resolve live entity info so if anything changes in leads/customers, it updates here immediately
+    coll = db.leads if camp.get("entity_type") == "lead" else db.customers
+    eids = [doc["entity_id"] for doc in raw_docs]
+    id_objs = [ObjectId(e) if ObjectId.is_valid(e) else e for e in eids]
+    ent_map = {str(e["_id"]): e async for e in coll.find(build_tenant_query(tid, {"_id": {"$in": id_objs}}))}
+
+    for doc in raw_docs:
+        ent = ent_map.get(doc["entity_id"])
+        if ent:
+            doc["name"] = ent.get("name", doc.get("name"))
+            doc["language"] = ent.get("language", doc.get("language"))
+
+    # Sort dialable unblocked recipients first, then by match score descending
+    def sort_key(doc: dict[str, Any]) -> tuple[int, float]:
+        ent = ent_map.get(doc["entity_id"], {})
+        phone = (ent.get("phone") or "").strip()
+        is_dialable = 0 if (phone and not is_fake_seeded_number(phone) and ent.get("consent") is True and not ent.get("dnd")) else 1
+        return (is_dialable, -float(doc.get("match_score", 0.0)))
+
+    raw_docs.sort(key=sort_key)
+
+    total = len(raw_docs)
+    total_pages = math.ceil(total / page_size) if total > 0 else 0
+    start_idx = (page - 1) * page_size
+    paged_docs = raw_docs[start_idx : start_idx + page_size]
+
+    items = [CampaignRecipientItem(**doc_to_dict(doc)) for doc in paged_docs]
     return PaginatedResponse(items=items, pagination=PaginationMeta(page=page, page_size=page_size, total=total, total_pages=total_pages))
 
 

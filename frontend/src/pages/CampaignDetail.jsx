@@ -28,7 +28,7 @@ export default function CampaignDetail() {
       const prog = await api.get(`/campaigns/${id}/progress`);
       setProgress(prog);
 
-      let q = `/campaigns/${id}/recipients?page=${page}&page_size=15`;
+      let q = `/campaigns/${id}/recipients?page=${page}&page_size=50`;
       if (statusFilter) q += `&status=${statusFilter}`;
       const rec = await api.get(q);
       setRecipients(rec.items || []);
@@ -237,6 +237,33 @@ export default function CampaignDetail() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {pagination.total_pages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-hairline bg-surface-strong/30 t-body-xs">
+            <span className="text-muted">
+              Showing {recipients.length} of {pagination.total} recipients (Page {page} of {pagination.total_pages})
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= pagination.total_pages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );

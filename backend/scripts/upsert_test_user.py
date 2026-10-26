@@ -13,12 +13,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from app.core.config import settings
 
 
-async def upsert_test_user(apply: bool = False) -> None:
-    """Ensure Test User 1 with allowlisted phone exists in Test Bank."""
+async def upsert_test_user(tenant_slug: str = "bangalore-bank", apply: bool = False) -> None:
+    """Ensure Test User 1 with allowlisted phone exists in specified tenant."""
     client = AsyncIOMotorClient(settings.mongo_uri)
     db = client[settings.mongo_db_name]
 
-    tenant = await db.tenants.find_one({"slug": "test-bank"})
+    tenant = await db.tenants.find_one({"slug": tenant_slug})
     if not tenant:
         print("[-] Tenant 'test-bank' not found.")
         client.close()
@@ -71,6 +71,7 @@ async def upsert_test_user(apply: bool = False) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--tenant", type=str, default="bangalore-bank", help="Tenant slug (default: bangalore-bank)")
     parser.add_argument("--apply", action="store_true", help="Apply updates to database")
     args = parser.parse_args()
-    asyncio.run(upsert_test_user(apply=args.apply))
+    asyncio.run(upsert_test_user(tenant_slug=args.tenant, apply=args.apply))

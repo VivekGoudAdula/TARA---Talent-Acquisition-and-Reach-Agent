@@ -13,6 +13,7 @@ from app.providers.bolna_voice import BolnaVoiceProvider
 from app.schemas.communication import CommunicationContent, CommunicationSendRequest, RecipientRef
 from app.services.campaign_variables import map_campaign_voice_variables
 from app.services.communication import dispatch_communication
+from app.services.compliance import is_fake_seeded_number
 
 logger = logging.getLogger("tara.services.campaigns")
 
@@ -167,6 +168,21 @@ async def run_campaign_dispatch(
     })
 
     recipients = await cursor.to_list(length=1000)
+
+    # Prioritize dialable / unblocked recipients first so real calls happen immediately
+    coll = db.leads if camp.get("entity_type") == "lead" else db.customers
+    eids = [r["entity_id"] for r in recipients]
+    id_objs = [ObjectId(e) if ObjectId.is_valid(e) else e for e in eids]
+    ent_map = {str(e["_id"]): e async for e in coll.find(build_tenant_query(tenant_id, {"_id": {"$in": id_objs}}))}
+
+    def get_dispatch_prio(r: dict[str, Any]) -> tuple[int, float]:
+        ent = ent_map.get(r["entity_id"], {})
+        phone = (ent.get("phone") or "").strip()
+        is_dialable = 0 if (phone and not is_fake_seeded_number(phone) and ent.get("consent") is True and not ent.get("dnd")) else 1
+        return (is_dialable, -float(r.get("match_score", 0.0)))
+
+    recipients.sort(key=get_dispatch_prio)
+
     for rcpt in recipients:
         # Check if campaign paused or cancelled before dispatch
         cur_camp = await db.campaigns.find_one({"_id": ObjectId(campaign_id)})
