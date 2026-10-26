@@ -159,3 +159,26 @@ python scripts/manual_test_call.py
 ```
 This script will authenticate as `employee@testbank.com`, pick the allowlisted lead, trigger `POST /api/communication/send`, and poll `GET /api/communications/{id}` for live outcome updates.
 
+---
+
+## Phase 4: Bolna Agent Prompt Variables Required
+
+For campaign voice configuration to dynamically control the voice agent during outbound calls, the Bolna agent's prompt in the Bolna platform must include these `{{variables}}` inside its **Conversation Flow** / **Agent Prompt**.
+
+### Required Template Variables
+- `{{opening_message}}` - The personalized opening greeting and introduction.
+- `{{objective}}` - The specific campaign conversation goal.
+- `{{system_prompt_addendum}}` - Additional tone and compliance instructions.
+- `{{questions_to_collect}}` - Formatted structured fields for the agent to collect.
+- `{{success_condition}}` - Criteria defining successful conversation completion.
+- `{{fallback_behaviour}}` - What the agent should do if objections or hurdles arise.
+- `{{tone}}` - Tone setting (Professional, Friendly, or Formal).
+- `{{language}}` - Target language for the conversation.
+- `{{product_name}}` - Offered product name.
+- `{{bank_name}}` - Lending institution name.
+
+### Ready-to-Paste Block for Bolna Agent's Conversation Flow
+```text
+Opening: {{opening_message}}. Objective: {{objective}}. Additional instructions: {{system_prompt_addendum}}. Collect these one at a time: {{questions_to_collect}}. Success means: {{success_condition}}. If something goes wrong: {{fallback_behaviour}}. Tone: {{tone}}.
+```
+

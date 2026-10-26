@@ -82,3 +82,19 @@ export function formatRole(role) {
   if (role === "EMPLOYEE") return "Employee";
   return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 }
+
+export function formatDate(dt) {
+  if (!dt) return "—";
+  try {
+    const d = new Date(dt);
+    return d.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return String(dt);
+  }
+}

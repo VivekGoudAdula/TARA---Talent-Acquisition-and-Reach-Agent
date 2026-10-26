@@ -67,6 +67,14 @@ async def init_db(db_name: str | None = None) -> None:
         [("scoring_run_id", 1), ("entity_id", 1), ("product_id", 1)],
         unique=True,
     )
+
+    # Campaign indexes
+    await db.campaigns.create_index([("tenant_id", 1), ("status", 1), ("updated_at", -1)])
+    await db.campaign_recipients.create_index([("tenant_id", 1), ("campaign_id", 1), ("status", 1)])
+    await db.campaign_recipients.create_index([("campaign_id", 1), ("entity_id", 1)], unique=True)
+    await db.campaign_configs.create_index([("campaign_id", 1), ("channel", 1), ("version", -1)])
+    await db.communications.create_index([("tenant_id", 1), ("campaign_id", 1), ("recipient_id", 1)])
+
     logger.info("MongoDB initialized with database '%s' and indexes verified.", target_db)
 
 

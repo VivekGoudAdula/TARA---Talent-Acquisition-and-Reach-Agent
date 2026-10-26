@@ -11,6 +11,9 @@ import Customers from "./pages/Customers";
 import Products from "./pages/Products";
 import ProductMatches from "./pages/ProductMatches";
 import Models from "./pages/Models";
+import Campaigns from "./pages/Campaigns";
+import CampaignWizard from "./pages/CampaignWizard";
+import CampaignDetail from "./pages/CampaignDetail";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -36,6 +39,10 @@ export default function App() {
               <Route path="matches" element={<ProductMatches />} />
               <Route path="products" element={<Products />} />
               <Route path="models" element={<Models />} />
+              <Route path="campaigns" element={<Campaigns />} />
+              <Route path="campaigns/new" element={<CampaignWizard />} />
+              <Route path="campaigns/:id/edit" element={<CampaignWizard />} />
+              <Route path="campaigns/:id" element={<CampaignDetail />} />
             </Route>
           </Route>
 

@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     contact_cap_days: int = 7
     public_base_url: str = "http://localhost:8000"
 
+    # Campaign Execution Configuration
+    campaign_max_recipients: int = 200
+    campaign_max_concurrent: int = 2
+    campaign_dispatch_delay_seconds: float = 5.0
+
     model_config = SettingsConfigDict(
         env_file=str(Path(__file__).resolve().parent.parent.parent / ".env"),
         env_file_encoding="utf-8",

@@ -33,11 +33,11 @@ export default function Layout() {
     { name: "Customers", path: "/app/customers", icon: UserCheck },
     { name: "Product Matches", path: "/app/matches", icon: Sparkles },
     { name: "Products", path: "/app/products", icon: Package },
+    { name: "Campaigns", path: "/app/campaigns", icon: Megaphone },
     { name: "Models", path: "/app/models", icon: Cpu },
   ];
 
   const disabledNavItems = [
-    { name: "Campaigns", icon: Megaphone, badge: "Phase 4" },
     { name: "Outcomes", icon: BarChart3, badge: "Phase 5" },
   ];
 
