@@ -89,7 +89,11 @@ def get_default_products(tenant_id: str) -> list[dict]:
 def generate_sample_leads(tenant_id: str, count: int = 40, verified_phones: list[str] | None = None) -> list[dict]:
     """Generate realistic Indian leads with non-dialable phone numbers and model features."""
     leads = []
-    verified_phones = verified_phones or []
+    if verified_phones is None:
+        from app.core.config import settings
+        verified_phones = [p for p in [settings.seed_test_phone_1, settings.seed_test_phone_2, settings.seed_test_phone_3] if p]
+    else:
+        verified_phones = list(verified_phones)
     for i in range(1, count + 1):
         city = random.choice(CITIES)
         lang = pick_language(city)
