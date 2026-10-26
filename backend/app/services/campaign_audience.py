@@ -135,6 +135,9 @@ async def get_audience_preview(
             already_selected=already_sel, will_be_blocked_reason=blocked_r, match_id=str(m["_id"]),
         ))
 
+    # Prioritize dialable (unblocked) candidates at the top, then sort by highest match score
+    candidates.sort(key=lambda c: (1 if c.will_be_blocked_reason else 0, -c.match_score))
+
     total = len(candidates)
     total_pages = math.ceil(total / page_size) if total > 0 else 0
     start_idx = (page - 1) * page_size

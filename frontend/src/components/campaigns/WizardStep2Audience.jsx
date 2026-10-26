@@ -27,7 +27,7 @@ export default function WizardStep2Audience({ campaignId, onAudienceSaved, saved
     if (!campaignId) return;
     setLoading(true);
     try {
-      let q = `/campaigns/${campaignId}/audience/preview?page=${page}&page_size=15&eligibility=${eligibilityFilter}`;
+      let q = `/campaigns/${campaignId}/audience/preview?page=${page}&page_size=50&eligibility=${eligibilityFilter}`;
       selectedBands.forEach((b) => (q += `&band=${b}`));
       if (minScore) q += `&min_score=${minScore}`;
       if (maxScore) q += `&max_score=${maxScore}`;
@@ -289,6 +289,26 @@ export default function WizardStep2Audience({ campaignId, onAudienceSaved, saved
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Bar */}
+        {pagination.total_pages > 1 && (
+          <div className="flex items-center justify-between p-3.5 border-t border-hairline t-body-sm text-muted bg-surface-strong/30">
+            <span>
+              Showing {(page - 1) * 50 + 1} to {Math.min(page * 50, pagination.total)} of {pagination.total} candidates
+            </span>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                Previous
+              </Button>
+              <span className="text-ink font-medium px-2">
+                Page {page} of {pagination.total_pages}
+              </span>
+              <Button variant="outline" size="sm" disabled={page >= pagination.total_pages} onClick={() => setPage((p) => p + 1)}>
+                Next
+              </Button>
+            </div>
           </div>
         )}
       </Card>
