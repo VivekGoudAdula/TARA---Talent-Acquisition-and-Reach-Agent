@@ -1,0 +1,18 @@
+# Git ignore rules for TARA
+.env
+.env.local
+.venv
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+node_modules/
+dist/
+build/
+.coverage
+.pytest_cache/
+*.egg-info/
+.DS_Store
+Thumbs.db
