@@ -8,7 +8,7 @@ import Button from "./Button";
  * Portaled to document.body so the backdrop blur extends to the very top and all edges of the viewport.
  * Features an opaque card surface, dark backdrop overlay, and escape key handling.
  */
-export default function Modal({ isOpen, onClose, title, subtitle, children, footer }) {
+export default function Modal({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "max-w-2xl" }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
@@ -33,7 +33,7 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, foot
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-2xl bg-surface-card border border-hairline rounded-xl shadow-soft overflow-hidden my-auto flex flex-col max-h-[90vh]">
+      <div className={`relative w-full ${maxWidth} bg-surface-card border border-hairline rounded-xl shadow-soft overflow-hidden my-auto flex flex-col max-h-[90vh]`}>
         {/* Header */}
         <div className="px-6 py-5 border-b border-hairline flex items-center justify-between shrink-0 bg-surface-card">
           <div>
