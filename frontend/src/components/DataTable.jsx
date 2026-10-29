@@ -13,14 +13,36 @@ export default function DataTable({
 }) {
   return (
     <div className="w-full bg-surface-card border border-hairline rounded-xl overflow-hidden shadow-soft">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-body min-w-[960px]">
+      <div className="w-full overflow-hidden">
+        <table className="w-full text-left text-body table-fixed border-collapse">
+          <colgroup>
+            {columns.map((col, idx) => {
+              let widthStyle = undefined;
+              if (col.width) {
+                if (col.width.startsWith("w-[")) {
+                  widthStyle = col.width.slice(3, -1);
+                } else if (!col.width.startsWith("w-")) {
+                  widthStyle = col.width;
+                }
+              } else {
+                widthStyle = `${100 / columns.length}%`;
+              }
+              return (
+                <col
+                  key={idx}
+                  className={col.width && col.width.startsWith("w-") ? col.width : ""}
+                  style={widthStyle ? { width: widthStyle } : undefined}
+                />
+              );
+            })}
+          </colgroup>
           <thead className="bg-canvas-soft/80 border-b border-hairline">
             <tr>
               {columns.map((col, idx) => (
                 <th
                   key={idx}
-                  className={`px-4 py-3 t-table-head text-muted ${col.className || ""}`}
+                  className={`px-2 py-2 text-[11px] font-semibold tracking-wider uppercase text-muted-soft truncate ${col.className || ""}`}
+                  title={typeof col.header === "string" ? col.header : undefined}
                 >
                   {col.header}
                 </th>
@@ -31,10 +53,10 @@ export default function DataTable({
             {loading ? (
               // Static grey loading skeleton (no shimmer)
               [...Array(5)].map((_, rIdx) => (
-                <tr key={rIdx} className="h-12">
+                <tr key={rIdx} className="h-11 sm:h-12">
                   {columns.map((_, cIdx) => (
-                    <td key={cIdx} className="px-4">
-                      <div className="h-4 bg-hairline rounded-md w-3/4 max-w-[140px]" />
+                    <td key={cIdx} className="px-3 sm:px-4">
+                      <div className="h-4 bg-hairline rounded-md w-3/4 max-w-[120px]" />
                     </td>
                   ))}
                 </tr>
@@ -57,14 +79,14 @@ export default function DataTable({
                   key={row.id || rowIdx}
                   id={`data-row-${rowIdx}`}
                   onClick={() => onRowClick && onRowClick(row)}
-                  className={`h-12 transition-colors ${
+                  className={`h-10 sm:h-10 transition-colors ${
                     onRowClick ? "cursor-pointer hover:bg-canvas-soft" : "hover:bg-canvas-soft/50"
                   }`}
                 >
                   {columns.map((col, colIdx) => (
                     <td
                       key={colIdx}
-                      className={`px-4 t-table text-body ${col.className || ""}`}
+                      className={`px-2 py-1.5 text-xs text-body truncate ${col.className || ""}`}
                     >
                       {col.render ? col.render(row) : row[col.accessor] ?? "—"}
                     </td>

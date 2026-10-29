@@ -96,22 +96,22 @@ export default function ProductMatches() {
   const resetFilters = () => { setSelectedProductId(""); setSelectedBands([]); setEligibilityFilter(""); setSearch(""); setMinScore(""); };
 
   const getBandBadge = (band) => {
-    if (band === "HIGH") return <Badge variant="purple">HIGH</Badge>;
-    if (band === "MEDIUM") return <Badge variant="info">MEDIUM</Badge>;
-    return <Badge variant="default">LOW</Badge>;
+    if (band === "HIGH") return <Badge variant="purple" className="text-[10px] px-1.5 py-0.5">HIGH</Badge>;
+    if (band === "MEDIUM") return <Badge variant="info" className="text-[10px] px-1.5 py-0.5">MEDIUM</Badge>;
+    return <Badge variant="default" className="text-[10px] px-1.5 py-0.5">LOW</Badge>;
   };
 
   const columns = [
     {
       header: entityTypeTab === "lead" ? "Lead Name" : "Customer Name",
-      className: "t-body-strong text-ink",
+      width: "24%",
       render: (row) => (
-        <div>
-          <div className="t-body-strong text-ink">{row.entity_name || "Unknown Entity"}</div>
-          <div className="t-caption text-muted flex items-center gap-2 mt-0.5">
+        <div className="truncate">
+          <div className="font-semibold text-ink text-xs truncate">{row.entity_name || "Unknown"}</div>
+          <div className="text-[10px] text-muted flex items-center gap-1.5 mt-0.5 truncate">
             <span>{row.entity_city || "Pan-India"}</span>
             {row.entity_language && (
-              <Badge variant={getLanguageVariant(row.entity_language)} dot={false}>
+              <Badge variant={getLanguageVariant(row.entity_language)} dot={false} className="text-[9px] px-1 py-0">
                 {formatLanguage(row.entity_language)}
               </Badge>
             )}
@@ -119,38 +119,53 @@ export default function ProductMatches() {
         </div>
       ),
     },
-    { header: "Product", accessor: "product_name", className: "t-body text-ink font-medium" },
+    {
+      header: "Product",
+      accessor: "product_name",
+      width: "18%",
+      render: (row) => (
+        <span className="text-xs font-medium text-ink truncate block" title={row.product_name}>
+          {row.product_name}
+        </span>
+      ),
+    },
     {
       header: "Fit Score",
-      className: "whitespace-nowrap",
+      width: "20%",
       render: (row) => (
-        <div className="flex items-center gap-2.5">
-          <div className="w-24 h-2 rounded-full bg-surface-strong overflow-hidden shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="w-12 sm:w-16 h-1.5 rounded-full bg-surface-strong overflow-hidden shrink-0">
             <div className="h-full bg-ink/75 rounded-full" style={{ width: `${Math.min(row.match_score, 100)}%` }} />
           </div>
-          <span className="t-body-strong text-ink">{row.match_score.toFixed(1)}%</span>
+          <span className="font-mono text-xs font-semibold text-ink">{row.match_score.toFixed(1)}%</span>
         </div>
       ),
     },
-    { header: "Band", render: (row) => getBandBadge(row.band) },
+    {
+      header: "Band",
+      width: "12%",
+      render: (row) => getBandBadge(row.band),
+    },
     {
       header: "Policy Eligibility",
+      width: "14%",
       render: (row) => (
-        <Badge variant={row.eligibility === "ELIGIBLE" ? "success" : "danger"}>
+        <Badge variant={row.eligibility === "ELIGIBLE" ? "success" : "danger"} className="text-[10px] px-1.5 py-0.5">
           {row.eligibility === "ELIGIBLE" ? "Eligible" : "Not Eligible"}
         </Badge>
       ),
     },
     {
       header: "Compliance",
+      width: "12%",
       className: "text-right",
       render: (row) => (
-        <div className="flex items-center justify-end gap-1.5">
-          <span className={`t-label px-2 py-0.5 rounded ${row.consent ? "text-emerald-700 bg-emerald-500/10" : "text-muted-soft bg-surface-strong"}`}>
-            {row.consent ? "Consent" : "No Consent"}
+        <div className="flex items-center justify-end gap-1">
+          <span className={`text-[10px] px-1.5 py-0.5 rounded ${row.consent ? "text-emerald-700 bg-emerald-500/10 font-medium" : "text-muted-soft bg-surface-strong"}`}>
+            {row.consent ? "Consent" : "No Cons."}
           </span>
-          <span className={`t-label px-2 py-0.5 rounded ${row.dnd ? "text-rose-700 bg-rose-500/10" : "text-muted bg-surface-strong"}`}>
-            {row.dnd ? "DND" : "DND Clr"}
+          <span className={`text-[10px] px-1.5 py-0.5 rounded ${row.dnd ? "text-rose-700 bg-rose-500/10 font-medium" : "text-muted bg-surface-strong"}`}>
+            {row.dnd ? "DND" : "Clr"}
           </span>
         </div>
       ),
@@ -158,7 +173,7 @@ export default function ProductMatches() {
   ];
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-5 w-full min-w-0 max-w-full font-sans">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-hairline">
         <div>
           <h1 className="t-h1 text-ink flex items-center gap-2">

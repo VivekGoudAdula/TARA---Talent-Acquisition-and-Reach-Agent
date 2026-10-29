@@ -37,7 +37,7 @@ export function PublicAuthRoute({ children }) {
   }
 
   if (user && token) {
-    return <Navigate to="/app/leads" replace />;
+    return <Navigate to="/app/dashboard" replace />;
   }
 
   return children || <Outlet />;

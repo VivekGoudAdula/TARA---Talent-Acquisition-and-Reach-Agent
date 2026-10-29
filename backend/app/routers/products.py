@@ -80,6 +80,17 @@ async def create_product(
     doc["_id"] = result.inserted_id
     doc["notice"] = "Product created. Run scoring to generate matches."
 
+    await db.audit_log.insert_one({
+        "tenant_id": current_user["tenant_id"],
+        "actor_user_id": current_user.get("user_id", current_user.get("id")),
+        "actor_email": current_user["email"],
+        "action": "product_created",
+        "entity_type": "product",
+        "entity_id": str(result.inserted_id),
+        "detail": {"name": payload.name, "category": payload.category},
+        "at": now,
+    })
+
     logger.info("Product '%s' (%s) created by %s", payload.name, str(result.inserted_id), current_user["email"])
     return ProductResponse(**doc_to_dict(doc))
 
@@ -117,6 +128,17 @@ async def update_product(
     resp_dict = doc_to_dict(updated_doc)
     resp_dict["notice"] = "Rescore to apply updated eligibility rules."
 
+    await db.audit_log.insert_one({
+        "tenant_id": current_user["tenant_id"],
+        "actor_user_id": current_user.get("user_id", current_user.get("id")),
+        "actor_email": current_user["email"],
+        "action": "product_updated",
+        "entity_type": "product",
+        "entity_id": str(existing["_id"]),
+        "detail": {"updates": [k for k in updates.keys() if k != "updated_at"]},
+        "at": updates["updated_at"],
+    })
+
     logger.info("Product %s updated by %s", product_id, current_user["email"])
     return ProductResponse(**resp_dict)
 
@@ -142,5 +164,16 @@ async def toggle_product_active(
     updated_doc = await db.products.find_one({"_id": existing["_id"]})
     resp_dict = doc_to_dict(updated_doc)
     resp_dict["notice"] = "Rescore to apply" if payload.active else "Product deactivated"
+
+    await db.audit_log.insert_one({
+        "tenant_id": current_user["tenant_id"],
+        "actor_user_id": current_user.get("user_id", current_user.get("id")),
+        "actor_email": current_user["email"],
+        "action": "product_status_toggled",
+        "entity_type": "product",
+        "entity_id": str(existing["_id"]),
+        "detail": {"active": payload.active},
+        "at": now,
+    })
 
     return ProductResponse(**resp_dict)

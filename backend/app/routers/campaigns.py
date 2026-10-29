@@ -13,6 +13,7 @@ from app.schemas.campaigns import (
     AudiencePreviewResponse, AudienceSetRequest, CampaignCreate, CampaignDetail,
     CampaignLaunchRequest, CampaignLaunchResponse, CampaignListItem, CampaignPreviewRequest,
     CampaignPreviewResponse, CampaignProgress, CampaignRecipientItem, CampaignUpdate,
+    RecipientScenarioUpdate,
 )
 from app.services.campaign_audience import get_audience_preview, preview_blocked_reason, set_campaign_audience
 from app.services.campaign_configs import DEFAULT_VOICE_CONFIG, get_campaign_configs, save_campaign_config
@@ -51,6 +52,7 @@ async def create_campaign(
         "channels": ["voice"], "audience_filter": {}, "include_not_eligible": False,
         "scoring_run_id": None, "config_version": 1, "created_by": uid, "created_at": now_utc,
         "updated_at": now_utc, "launched_at": None, "completed_at": None,
+        "test_run_label": req.test_run_label.strip() if req.test_run_label else None,
     }
     cid = str((await db.campaigns.insert_one(doc)).inserted_id)
     doc["_id"] = ObjectId(cid)
@@ -91,7 +93,7 @@ async def list_campaigns(
         contacted = counts.get("CONTACTED", 0) + counts.get("INTERESTED", 0) + counts.get("CALLBACK", 0) + counts.get("NOT_INTERESTED", 0)
         items.append(CampaignListItem(
             id=cid, name=c["name"], product_id=c["product_id"], product_name=c.get("product_name", "Product"),
-            entity_type=c["entity_type"], status=c["status"], total_recipients=tot_rcpt,
+            entity_type=c["entity_type"], status=c["status"], test_run_label=c.get("test_run_label"), total_recipients=tot_rcpt,
             contacted_count=contacted, recipient_counts=counts, updated_at=c["updated_at"], created_at=c["created_at"],
         ))
 
@@ -123,6 +125,7 @@ async def update_campaign(
     if req.description is not None: updates["description"] = req.description
     if req.objective is not None: updates["objective"] = req.objective.strip()
     if req.entity_type is not None: updates["entity_type"] = req.entity_type
+    if req.test_run_label is not None: updates["test_run_label"] = req.test_run_label.strip() if req.test_run_label else None
     if req.product_id is not None:
         prod = await db.products.find_one(build_tenant_query(tid, {"_id": ObjectId(req.product_id) if ObjectId.is_valid(req.product_id) else req.product_id}))
         if not prod: raise HTTPException(status.HTTP_400_BAD_REQUEST, "Selected product not found")
@@ -230,6 +233,24 @@ async def remove_recipient(
     if res.deleted_count == 0:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Recipient not found in campaign")
     return {"message": "Recipient removed successfully"}
+
+
+@router.patch("/{id}/recipients/{entity_id}/scenario")
+async def update_recipient_scenario(
+    id: str, entity_id: str, req: RecipientScenarioUpdate, user: dict[str, Any] = Depends(require_roles(["SUPER_ADMIN", "EMPLOYEE"])),
+) -> dict[str, Any]:
+    """Assign or update a tester scenario note for a recipient (DRAFT or READY campaigns only)."""
+    db, tid = get_db(), user["tenant_id"]
+    camp = await resolve_campaign(db, tid, id)
+    if camp.get("status") not in ("DRAFT", "READY"):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Tester scenario can only be modified for DRAFT or READY campaigns")
+    res = await db.campaign_recipients.update_one(
+        {"campaign_id": id, "tenant_id": tid, "entity_id": entity_id},
+        {"$set": {"tester_scenario": req.tester_scenario, "updated_at": datetime.now(timezone.utc)}},
+    )
+    if res.matched_count == 0:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Recipient not found in campaign")
+    return {"message": "Tester scenario updated", "tester_scenario": req.tester_scenario}
 
 
 @router.put("/{id}/config/{channel}")

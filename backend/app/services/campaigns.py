@@ -212,6 +212,7 @@ async def run_campaign_dispatch(
             campaign_id=campaign_id,
             config_version=camp.get("config_version", 1),
             idempotency_key=idempotency_key,
+            metadata={"test_run_label": camp.get("test_run_label")} if camp.get("test_run_label") else {},
         )
 
         try:

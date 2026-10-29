@@ -56,10 +56,14 @@ optgroup {
   font-family: 'EB Garamond', 'Times New Roman', Georgia, serif;
 }
 
+html,
 body {
   background-color: var(--color-canvas);
   color: var(--color-ink);
   font-family: 'EB Garamond', 'Times New Roman', Georgia, serif;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 @layer components {

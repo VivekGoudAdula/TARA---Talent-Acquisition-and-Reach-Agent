@@ -82,51 +82,51 @@ export default function Customers() {
 
   const columns = [
     {
-      header: "Customer Name",
+      header: "Customer",
       accessor: "name",
-      className: "t-body-strong text-ink",
+      width: "18%",
       render: (row) => (
-        <div>
-          <div className="t-body-strong text-ink">{row.name}</div>
-          <div className="t-caption text-muted">{row.phone}</div>
+        <div className="truncate">
+          <div className="font-semibold text-ink text-xs truncate" title={row.name}>{row.name}</div>
+          <div className="text-[10px] text-muted font-mono">{row.phone}</div>
         </div>
       ),
     },
     {
-      header: "Location & Age",
-      className: "whitespace-nowrap",
+      header: "Location",
+      width: "12%",
       render: (row) => (
-        <div>
-          <span className="t-body-strong text-ink">{row.city}</span>
-          <span className="t-caption text-muted ml-1.5">({row.age}y)</span>
+        <div className="truncate text-xs">
+          <span className="font-medium text-ink">{row.city}</span>
+          <span className="text-[10px] text-muted ml-0.5">({row.age}y)</span>
         </div>
       ),
     },
     {
       header: "Language",
-      className: "whitespace-nowrap",
+      width: "11%",
       render: (row) => (
-        <Badge variant={getLanguageVariant(row.language)}>
+        <Badge variant={getLanguageVariant(row.language)} className="text-[10px] px-1.5 py-0.5">
           {formatLanguage(row.language)}
         </Badge>
       ),
     },
     {
-      header: "Monthly Income",
-      className: "whitespace-nowrap",
+      header: "Monthly Inc.",
+      width: "12%",
       render: (row) => (
-        <span className="t-table text-body-strong">
+        <span className="font-mono text-xs text-body-strong">
           {formatCurrency(row.income)}
         </span>
       ),
     },
     {
-      header: "Health Score",
-      className: "whitespace-nowrap",
+      header: "Health",
+      width: "11%",
       render: (row) => (
-        <div className="flex items-center gap-1.5 t-table text-body-strong">
+        <div className="flex items-center gap-1 font-mono text-xs text-body-strong">
           <HeartPulse
-            className={`w-3.5 h-3.5 ${
+            className={`w-3 h-3 shrink-0 ${
               row.financial_health >= 75
                 ? "text-semantic-success"
                 : row.financial_health >= 60
@@ -140,37 +140,37 @@ export default function Customers() {
     },
     {
       header: "Repayment",
-      className: "whitespace-nowrap",
+      width: "11%",
       render: (row) => (
-        <Badge variant={getRepaymentVariant(row.repayment_behaviour)}>
+        <Badge variant={getRepaymentVariant(row.repayment_behaviour)} className="text-[10px] px-1.5 py-0.5">
           {formatRepayment(row.repayment_behaviour)}
         </Badge>
       ),
     },
     {
-      header: "Existing Products",
-      className: "whitespace-nowrap",
+      header: "Products",
+      width: "14%",
       render: (row) =>
         row.existing_products && row.existing_products.length > 0 ? (
-          <div className="flex items-center gap-1.5 whitespace-nowrap">
-            <span className="px-2.5 py-0.5 rounded-full bg-surface-strong border border-hairline t-caption text-body">
+          <div className="flex items-center gap-1 truncate">
+            <span className="px-1.5 py-0.5 rounded-full bg-surface-strong border border-hairline text-[10px] text-body truncate max-w-[75px]" title={row.existing_products[0]}>
               {row.existing_products[0]}
             </span>
             {row.existing_products.length > 1 && (
-              <span className="px-2 py-0.5 rounded-full bg-surface-strong text-muted t-caption font-medium">
-                +{row.existing_products.length - 1} more
+              <span className="text-[10px] text-muted font-medium shrink-0">
+                +{row.existing_products.length - 1}
               </span>
             )}
           </div>
         ) : (
-          <span className="text-muted t-caption">—</span>
+          <span className="text-muted text-[10px]">—</span>
         ),
     },
     {
       header: "DND Status",
-      className: "whitespace-nowrap",
+      width: "11%",
       render: (row) =>
-        row.dnd ? <Badge variant="danger">DND Active</Badge> : <Badge variant="default">DND Cleared</Badge>,
+        row.dnd ? <Badge variant="danger" className="text-[10px] px-1.5 py-0.5">DND Active</Badge> : <Badge variant="default" className="text-[10px] px-1.5 py-0.5">DND Cleared</Badge>,
     },
   ];
 
@@ -188,7 +188,7 @@ export default function Customers() {
     ) : null;
 
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto font-sans">
+    <div className="space-y-5 w-full min-w-0 max-w-full font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

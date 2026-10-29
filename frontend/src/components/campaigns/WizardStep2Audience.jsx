@@ -228,17 +228,26 @@ export default function WizardStep2Audience({ campaignId, onAudienceSaved, saved
         ) : candidates.length === 0 ? (
           <div className="p-8 text-center text-muted t-body-sm">No candidate matches found for current filter.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="w-full overflow-hidden">
+            <table className="w-full text-left border-collapse table-fixed">
+              <colgroup>
+                <col style={{ width: "6%" }} />
+                <col style={{ width: "20%" }} />
+                <col style={{ width: "11%" }} />
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "15%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "14%" }} />
+              </colgroup>
               <thead>
-                <tr className="border-b border-hairline bg-surface-strong/50 t-label text-muted text-xs">
-                  <th className="py-2.5 px-4 w-10">Select</th>
-                  <th className="py-2.5 px-4">Candidate</th>
-                  <th className="py-2.5 px-4">Language</th>
-                  <th className="py-2.5 px-4">Fit Score & Band</th>
-                  <th className="py-2.5 px-4">Policy Eligibility</th>
-                  <th className="py-2.5 px-4">Compliance Status</th>
-                  <th className="py-2.5 px-4">Dispatch Prediction</th>
+                <tr className="border-b border-hairline bg-surface-strong/50 text-muted text-[11px] font-semibold uppercase tracking-wider">
+                  <th className="py-2 px-2.5 text-center">Select</th>
+                  <th className="py-2 px-2.5">Candidate</th>
+                  <th className="py-2 px-2.5">Language</th>
+                  <th className="py-2 px-2.5">Fit Score & Band</th>
+                  <th className="py-2 px-2.5">Policy Eligibility</th>
+                  <th className="py-2 px-2.5">Compliance Status</th>
+                  <th className="py-2 px-2.5">Dispatch Prediction</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-hairline">
@@ -246,7 +255,7 @@ export default function WizardStep2Audience({ campaignId, onAudienceSaved, saved
                   const isChecked = selectedIds.has(c.entity_id);
                   return (
                     <tr key={c.entity_id} className={`hover:bg-surface-strong/30 ${isChecked ? "bg-primary/5" : ""}`}>
-                      <td className="py-2.5 px-4">
+                      <td className="py-2 px-2.5 text-center">
                         <input
                           type="checkbox"
                           checked={isChecked}
@@ -254,32 +263,32 @@ export default function WizardStep2Audience({ campaignId, onAudienceSaved, saved
                           className="w-4 h-4 rounded text-primary"
                         />
                       </td>
-                      <td className="py-2.5 px-4">
-                        <div className="font-semibold text-ink text-sm">{c.name}</div>
-                        <div className="t-body-xs text-muted font-mono">{c.phone_masked}</div>
+                      <td className="py-2 px-2.5 truncate">
+                        <div className="font-semibold text-ink text-xs truncate" title={c.name}>{c.name}</div>
+                        <div className="text-[10px] text-muted font-mono">{c.phone_masked}</div>
                       </td>
-                      <td className="py-2.5 px-4 uppercase font-mono text-xs text-muted">{c.language}</td>
-                      <td className="py-2.5 px-4">
-                        <Badge variant={c.band === "HIGH" ? "success" : c.band === "MEDIUM" ? "info" : "warning"}>
+                      <td className="py-2 px-2.5 uppercase font-mono text-xs text-muted truncate">{c.language}</td>
+                      <td className="py-2 px-2.5 truncate">
+                        <Badge variant={c.band === "HIGH" ? "success" : c.band === "MEDIUM" ? "info" : "warning"} className="text-[10px] px-1.5 py-0.5">
                           {c.band} ({Math.round(c.match_score)}%)
                         </Badge>
                       </td>
-                      <td className="py-2.5 px-4">
-                        <Badge variant={c.eligibility === "ELIGIBLE" ? "success" : "danger"}>
+                      <td className="py-2 px-2.5 truncate">
+                        <Badge variant={c.eligibility === "ELIGIBLE" ? "success" : "danger"} className="text-[10px] px-1.5 py-0.5">
                           {c.eligibility}
                         </Badge>
                       </td>
-                      <td className="py-2.5 px-4 t-body-xs text-muted space-x-2">
-                        <span>Consent: {c.consent ? "Yes" : "No"}</span>
+                      <td className="py-2 px-2.5 text-[11px] text-muted space-x-1.5 truncate">
+                        <span>Cons: {c.consent ? "Yes" : "No"}</span>
                         <span>DND: {c.dnd ? "Yes" : "No"}</span>
                       </td>
-                      <td className="py-2.5 px-4">
+                      <td className="py-2 px-2.5 truncate">
                         {c.will_be_blocked_reason ? (
-                          <Badge variant="warning" dot={true}>
-                            Blocked: {c.will_be_blocked_reason}
+                          <Badge variant="warning" dot={true} className="text-[10px] px-1.5 py-0.5 truncate max-w-[120px]" title={c.will_be_blocked_reason}>
+                            {c.will_be_blocked_reason}
                           </Badge>
                         ) : (
-                          <Badge variant="success" dot={true}>
+                          <Badge variant="success" dot={true} className="text-[10px] px-1.5 py-0.5">
                             Dialable
                           </Badge>
                         )}

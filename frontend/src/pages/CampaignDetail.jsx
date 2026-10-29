@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Pause, Play, Ban, RotateCcw, Edit, RefreshCw, ShieldAlert, PhoneCall, ExternalLink } from "lucide-react";
+import { ArrowLeft, Pause, Play, Ban, RotateCcw, Edit, RefreshCw, ShieldAlert, PhoneCall, ExternalLink, BarChart3 } from "lucide-react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
@@ -92,6 +92,11 @@ export default function CampaignDetail() {
               <span className="t-body-xs font-mono text-muted bg-surface-strong px-2 py-0.5 rounded">
                 v{campaign.config_version}
               </span>
+              {campaign.test_run_label && (
+                <span className="t-body-xs font-mono text-primary bg-primary/10 px-2 py-0.5 rounded">
+                  tag: {campaign.test_run_label}
+                </span>
+              )}
             </div>
             <p className="t-body-xs text-muted mt-0.5">
               {campaign.product_name} • {campaign.entity_type}s • Updated {formatDate(campaign.updated_at)}
@@ -119,6 +124,11 @@ export default function CampaignDetail() {
           <Button variant="outline" size="sm" onClick={() => handleAction("retry")} disabled={actionLoading} title="Retry failed or unanswered recipients">
             <RotateCcw className="w-3.5 h-3.5 mr-1" /> Retry Failed
           </Button>
+          <Link to={`/app/outcomes?campaign_id=${id}`}>
+            <Button variant="outline" size="sm">
+              <BarChart3 className="w-3.5 h-3.5 mr-1 text-primary" /> Outcomes & Evidence
+            </Button>
+          </Link>
           {!["COMPLETED", "CANCELLED"].includes(campaign.status) && (
             <Button variant="text" size="sm" onClick={() => handleAction("cancel")} disabled={actionLoading} className="text-semantic-error">
               <Ban className="w-3.5 h-3.5 mr-1" /> Cancel
@@ -182,49 +192,82 @@ export default function CampaignDetail() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="w-full overflow-hidden">
+          <table className="w-full text-left border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: "18%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "13%" }} />
+              <col style={{ width: "15%" }} />
+              <col style={{ width: "16%" }} />
+              <col style={{ width: "7%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "7%" }} />
+            </colgroup>
             <thead>
-              <tr className="border-b border-hairline bg-surface-strong/50 t-label text-muted text-xs">
-                <th className="py-2.5 px-4">Recipient Name</th>
-                <th className="py-2.5 px-4">Snapshot Fit</th>
-                <th className="py-2.5 px-4">Policy Eligibility</th>
-                <th className="py-2.5 px-4">Outreach Status</th>
-                <th className="py-2.5 px-4">Attempts</th>
-                <th className="py-2.5 px-4">Last Contact</th>
-                <th className="py-2.5 px-4 text-right">Call Record</th>
+              <tr className="border-b border-hairline bg-surface-strong/50 text-muted text-[11px] font-semibold uppercase tracking-wider">
+                <th className="py-2 px-2.5">Recipient Name</th>
+                <th className="py-2 px-2.5">Snapshot Fit</th>
+                <th className="py-2 px-2.5">Policy Eligibility</th>
+                <th className="py-2 px-2.5">Outreach Status</th>
+                <th className="py-2 px-2.5">Tester Scenario</th>
+                <th className="py-2 px-2.5">Attempts</th>
+                <th className="py-2 px-2.5">Last Contact</th>
+                <th className="py-2 px-2.5 text-right">Call Record</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-hairline">
               {recipients.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-muted t-body-sm">
+                  <td colSpan={8} className="py-8 text-center text-muted text-xs">
                     No recipients found matching current status filter.
                   </td>
                 </tr>
               ) : (
                 recipients.map((r) => (
                   <tr key={r.id} className="hover:bg-surface-strong/30">
-                    <td className="py-2.5 px-4 font-semibold text-ink text-sm">{r.name}</td>
-                    <td className="py-2.5 px-4">
-                      <Badge variant={r.band === "HIGH" ? "success" : r.band === "MEDIUM" ? "info" : "warning"}>
+                    <td className="py-2 px-2.5 font-semibold text-ink text-xs truncate" title={r.name}>{r.name}</td>
+                    <td className="py-2 px-2.5">
+                      <Badge variant={r.band === "HIGH" ? "success" : r.band === "MEDIUM" ? "info" : "warning"} className="text-[10px] px-1.5 py-0.5">
                         {r.band} ({Math.round(r.match_score)}%)
                       </Badge>
                     </td>
-                    <td className="py-2.5 px-4">
-                      <Badge variant={r.eligibility === "ELIGIBLE" ? "success" : "danger"}>{r.eligibility}</Badge>
+                    <td className="py-2 px-2.5">
+                      <Badge variant={r.eligibility === "ELIGIBLE" ? "success" : "danger"} className="text-[10px] px-1.5 py-0.5">{r.eligibility}</Badge>
                     </td>
-                    <td className="py-2.5 px-4">
-                      <Badge variant={r.status === "INTERESTED" ? "success" : r.status === "BLOCKED" ? "warning" : r.status === "CALLING" ? "info" : "default"}>
+                    <td className="py-2 px-2.5">
+                      <Badge variant={r.status === "INTERESTED" ? "success" : r.status === "BLOCKED" ? "warning" : r.status === "CALLING" ? "info" : "default"} className="text-[10px] px-1.5 py-0.5">
                         {r.status}
                       </Badge>
-                      {r.blocked_reason && <span className="block text-[11px] font-mono text-muted mt-0.5">{r.blocked_reason}</span>}
+                      {r.blocked_reason && <span className="block text-[10px] font-mono text-muted mt-0.5 truncate" title={r.blocked_reason}>{r.blocked_reason}</span>}
                     </td>
-                    <td className="py-2.5 px-4 t-body-xs font-mono text-muted">{r.attempts}</td>
-                    <td className="py-2.5 px-4 t-body-xs text-muted">{r.last_contact_at ? formatDate(r.last_contact_at) : "—"}</td>
-                    <td className="py-2.5 px-4 text-right">
+                    <td className="py-2 px-2.5 text-xs truncate">
+                      {["DRAFT", "READY"].includes(campaign.status) ? (
+                        <input
+                          type="text"
+                          defaultValue={r.tester_scenario || ""}
+                          placeholder="e.g. interested+amount"
+                          onBlur={async (e) => {
+                            const val = e.target.value.trim();
+                            if (val !== (r.tester_scenario || "")) {
+                              try {
+                                await api.patch(`/campaigns/${id}/recipients/${r.entity_id}/scenario`, { tester_scenario: val || null });
+                              } catch (err) {
+                                console.error("Failed to update scenario", err);
+                              }
+                            }
+                          }}
+                          className="input-base text-[11px] py-1 px-1.5 h-6 w-full max-w-[130px] font-mono"
+                        />
+                      ) : (
+                        <span className="font-mono text-muted text-[10px] truncate block">{r.tester_scenario || "—"}</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-2.5 text-xs font-mono text-muted">{r.attempts}</td>
+                    <td className="py-2 px-2.5 text-[11px] text-muted truncate">{r.last_contact_at ? formatDate(r.last_contact_at) : "—"}</td>
+                    <td className="py-2 px-2.5 text-right">
                       {r.last_communication_id ? (
-                        <span className="text-xs font-mono text-muted flex items-center justify-end gap-1">
+                        <span className="text-[11px] font-mono text-muted flex items-center justify-end gap-1">
                           #{r.last_communication_id.slice(-6)}
                         </span>
                       ) : (

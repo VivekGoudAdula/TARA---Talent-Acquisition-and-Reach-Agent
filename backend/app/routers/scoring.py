@@ -40,6 +40,21 @@ async def trigger_scoring_run(
             entity_type=payload.entity_type,
             product_ids=payload.product_ids,
         )
+        db = get_db()
+        await db.audit_log.insert_one({
+            "tenant_id": current_user["tenant_id"],
+            "actor_user_id": current_user.get("user_id", current_user.get("id")),
+            "actor_email": current_user["email"],
+            "action": "scoring_run",
+            "entity_type": payload.entity_type,
+            "entity_id": run_dict.get("id"),
+            "detail": {
+                "entity_count": run_dict.get("entity_count", 0),
+                "match_count": run_dict.get("match_count", 0),
+                "product_ids": run_dict.get("product_ids", []),
+            },
+            "at": datetime.now(timezone.utc),
+        })
         return ScoringRunSummary(**run_dict)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
@@ -245,6 +260,20 @@ async def update_scoring_settings(
         await db.tenants.update_one({"_id": ObjectId(tenant_id)}, {"$set": update_doc})
     else:
         await db.tenants.update_one({"_id": tenant_id}, {"$set": update_doc})
+
+    await db.audit_log.insert_one({
+        "tenant_id": tenant_id,
+        "actor_user_id": current_user.get("user_id", current_user.get("id")),
+        "actor_email": current_user["email"],
+        "action": "settings_updated",
+        "entity_type": "settings",
+        "entity_id": str(tenant_id),
+        "detail": {
+            "threshold_high": payload.threshold_high,
+            "threshold_low": payload.threshold_low,
+        },
+        "at": datetime.now(timezone.utc),
+    })
 
     logger.info("Scoring thresholds updated for tenant %s: high=%.1f, low=%.1f", tenant_id, payload.threshold_high, payload.threshold_low)
     return payload

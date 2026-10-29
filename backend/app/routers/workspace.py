@@ -4,8 +4,8 @@ import logging
 from typing import Any
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.core.db import build_tenant_query, get_db
-from app.core.deps import require_role
+from app.core.db import build_tenant_query, doc_to_dict, get_db
+from app.core.deps import get_current_user, require_role
 from app.core.sample_data import generate_sample_customers, generate_sample_leads, get_default_products
 
 logger = logging.getLogger("tara.workspace")
@@ -65,4 +65,145 @@ async def load_sample_data(
             "leads": len(leads),
             "customers": len(customers),
         },
+    }
+
+
+@router.get("/dashboard")
+async def get_dashboard_summary(
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Retrieve getting-started checklist, summary metrics, and recent audit activity from real DB data."""
+    db = get_db()
+    tenant_id = current_user["tenant_id"]
+    t_query = build_tenant_query(tenant_id)
+
+    # 1. Real entity counts
+    leads_count = await db.leads.count_documents(t_query)
+    customers_count = await db.customers.count_documents(t_query)
+    products_count = await db.products.count_documents(t_query)
+    active_products = await db.products.count_documents(build_tenant_query(tenant_id, {"active": True}))
+
+    # 2. Last scoring run
+    last_run_doc = await db.scoring_runs.find_one(t_query, sort=[("created_at", -1)])
+    is_stale = False
+    last_run_time = None
+    if last_run_doc:
+        last_run_time = last_run_doc.get("created_at")
+        # Check if new leads/customers or updated products exist after last scoring run
+        new_leads = await db.leads.count_documents(build_tenant_query(tenant_id, {"created_at": {"$gt": last_run_time}}))
+        new_customers = await db.customers.count_documents(build_tenant_query(tenant_id, {"created_at": {"$gt": last_run_time}}))
+        is_stale = (new_leads > 0 or new_customers > 0)
+        last_run_time = last_run_time.isoformat() if hasattr(last_run_time, "isoformat") else str(last_run_time)
+
+    # 3. Campaigns counts by status
+    campaign_cursor = db.campaigns.aggregate([
+        {"$match": t_query},
+        {"$group": {"_id": "$status", "count": {"$sum": 1}}},
+    ])
+    campaign_status_counts: dict[str, int] = {}
+    total_campaigns = 0
+    active_campaigns = 0
+    async for row in campaign_cursor:
+        status_name = row["_id"] or "DRAFT"
+        cnt = row["count"]
+        campaign_status_counts[status_name] = cnt
+        total_campaigns += cnt
+        if status_name in ("ACTIVE", "LAUNCHING"):
+            active_campaigns += cnt
+
+    # 4. Communications and outcomes summary (all time)
+    calls_attempted = await db.communications.count_documents(t_query)
+    calls_completed = await db.communications.count_documents(build_tenant_query(tenant_id, {"status": {"$in": ["completed", "answered", "success"]}}))
+    calls_interested = await db.communications.count_documents(build_tenant_query(tenant_id, {"interest_level": "INTERESTED"}))
+    compliance_blocked = await db.communications.count_documents(build_tenant_query(tenant_id, {"status": "blocked"}))
+
+    # 5. Checklist computation
+    step1_done = (leads_count + customers_count) > 0
+    step2_done = products_count > 0
+    step3_done = bool(last_run_doc and not is_stale)
+    step4_done = total_campaigns > 0
+    step5_done = calls_completed > 0
+
+    checklist = [
+        {
+            "step": 1,
+            "title": "Data loaded",
+            "state": "done" if step1_done else "next",
+            "detail": f"{leads_count} leads, {customers_count} customers in registry" if step1_done else "Upload a CSV file or load sample bank portfolio",
+            "counts": {"leads": leads_count, "customers": customers_count},
+            "link": "/app/data-import",
+            "action_label": "Import Data" if not step1_done else "Manage Data",
+        },
+        {
+            "step": 2,
+            "title": "Products configured",
+            "state": "done" if step2_done else ("next" if step1_done else "blocked"),
+            "detail": f"{products_count} product(s) configured ({active_products} active)" if step2_done else "Define financial products and eligibility rules",
+            "counts": {"total": products_count, "active": active_products},
+            "link": "/app/products",
+            "action_label": "Configure Products",
+        },
+        {
+            "step": 3,
+            "title": "Scoring run",
+            "state": "done" if step3_done else ("next" if (step1_done and step2_done) else "blocked"),
+            "detail": (f"Last run: {last_run_time[:19].replace('T', ' ')} UTC" + (" (Stale)" if is_stale else "")) if last_run_doc else "Run calibrated ML scoring & eligibility matching",
+            "last_run_at": last_run_time,
+            "is_stale": is_stale,
+            "link": "/app/matches",
+            "action_label": "Run Scoring",
+        },
+        {
+            "step": 4,
+            "title": "Campaign created & launched",
+            "state": "done" if step4_done else ("next" if step3_done else "blocked"),
+            "detail": f"{total_campaigns} campaign(s) created ({active_campaigns} active)" if step4_done else "Create an audience, configure voice agent, and preview",
+            "counts": {"total": total_campaigns, "active": active_campaigns},
+            "link": "/app/campaigns",
+            "action_label": "New Campaign",
+        },
+        {
+            "step": 5,
+            "title": "Outcomes captured",
+            "state": "done" if step5_done else ("next" if step4_done else "blocked"),
+            "detail": f"{calls_completed} completed calls recorded ({calls_interested} interested)" if step5_done else "Monitor live calls and collect structured interaction history",
+            "counts": {"completed": calls_completed, "interested": calls_interested},
+            "link": "/app/outcomes",
+            "action_label": "View Outcomes",
+        },
+    ]
+
+    # 6. Recent activity from audit_log (last 10)
+    audit_cursor = db.audit_log.find(t_query).sort("at", -1).limit(10)
+    recent_activity = []
+    async for a in audit_cursor:
+        doc_dict = doc_to_dict(a)
+        if "at" in doc_dict and hasattr(doc_dict["at"], "isoformat"):
+            doc_dict["at"] = doc_dict["at"].isoformat()
+        recent_activity.append(doc_dict)
+
+    return {
+        "checklist": checklist,
+        "summary": {
+            "leads": leads_count,
+            "customers": customers_count,
+            "products": products_count,
+            "active_products": active_products,
+            "last_scoring_run": {
+                "last_run_at": last_run_time,
+                "is_stale": is_stale,
+            },
+            "campaigns": {
+                "total": total_campaigns,
+                "active": active_campaigns,
+                "by_status": campaign_status_counts,
+            },
+            "calls": {
+                "attempted": calls_attempted,
+                "completed": calls_completed,
+                "interested": calls_interested,
+            },
+            "compliance_blocked": compliance_blocked,
+        },
+        "recent_activity": recent_activity,
     }

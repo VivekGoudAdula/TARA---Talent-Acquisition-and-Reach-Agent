@@ -19,6 +19,9 @@ def get_db() -> AsyncIOMotorDatabase:
     return db
 
 
+_indexes_verified_dbs: set[str] = set()
+
+
 async def init_db(db_name: str | None = None) -> None:
     """Initialize MongoDB client and create necessary indexes."""
     global client, db
@@ -29,6 +32,9 @@ async def init_db(db_name: str | None = None) -> None:
 
     # Verify connection
     await client.admin.command("ping")
+
+    if target_db in _indexes_verified_dbs:
+        return
 
     # Ensure required indexes
     await db.users.create_index("email", unique=True)
@@ -74,6 +80,13 @@ async def init_db(db_name: str | None = None) -> None:
     await db.campaign_recipients.create_index([("campaign_id", 1), ("entity_id", 1)], unique=True)
     await db.campaign_configs.create_index([("campaign_id", 1), ("channel", 1), ("version", -1)])
     await db.communications.create_index([("tenant_id", 1), ("campaign_id", 1), ("recipient_id", 1)])
+
+    # Import and Audit indexes
+    await db.import_batches.create_index([("tenant_id", 1), ("created_at", -1)])
+    await db.import_batch_rows.create_index([("batch_id", 1), ("tenant_id", 1)])
+    await db.audit_log.create_index([("tenant_id", 1), ("at", -1)])
+
+    _indexes_verified_dbs.add(target_db)
 
     logger.info("MongoDB initialized with database '%s' and indexes verified.", target_db)
 

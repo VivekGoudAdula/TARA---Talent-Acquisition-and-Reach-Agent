@@ -82,72 +82,76 @@ export default function Leads() {
 
   const columns = [
     {
-      header: "Lead Name",
+      header: "Lead",
       accessor: "name",
-      className: "t-body-strong text-ink",
+      width: "18%",
       render: (row) => (
-        <div>
-          <div className="t-body-strong text-ink">{row.name}</div>
-          <div className="t-caption text-muted">{row.phone}</div>
+        <div className="truncate">
+          <div className="font-semibold text-ink text-xs truncate" title={row.name}>{row.name}</div>
+          <div className="text-[10px] text-muted font-mono">{row.phone}</div>
         </div>
       ),
     },
     {
       header: "City & Age",
-      className: "whitespace-nowrap",
+      width: "12%",
       render: (row) => (
-        <div>
-          <span className="t-body-strong text-ink">{row.city}</span>
-          <span className="t-caption text-muted ml-1.5">({row.age}y)</span>
+        <div className="truncate text-xs">
+          <span className="font-medium text-ink">{row.city}</span>
+          <span className="text-[10px] text-muted ml-0.5">({row.age}y)</span>
         </div>
       ),
     },
     {
       header: "Language",
-      className: "whitespace-nowrap",
+      width: "11%",
       render: (row) => (
-        <Badge variant={getLanguageVariant(row.language)}>
+        <Badge variant={getLanguageVariant(row.language)} className="text-[10px] px-1.5 py-0.5">
           {formatLanguage(row.language)}
         </Badge>
       ),
     },
     {
-      header: "Monthly Income",
-      className: "whitespace-nowrap",
+      header: "Monthly Inc.",
+      width: "12%",
       render: (row) => (
-        <span className="t-table text-body-strong">
+        <span className="font-mono text-xs text-body-strong">
           {formatCurrency(row.income)}
         </span>
       ),
     },
     {
       header: "Segment",
-      className: "whitespace-nowrap",
+      width: "12%",
       render: (row) => (
-        <span className="t-table text-body">{formatSegment(row.segment)}</span>
+        <span className="text-xs text-body truncate block" title={formatSegment(row.segment)}>
+          {formatSegment(row.segment)}
+        </span>
       ),
     },
     {
       header: "Consent",
-      className: "whitespace-nowrap",
+      width: "12%",
       render: (row) =>
         row.consent ? (
-          <Badge variant="success">Consent Given</Badge>
+          <Badge variant="success" className="text-[10px] px-1.5 py-0.5">Consent Given</Badge>
         ) : (
-          <Badge variant="danger">No Consent</Badge>
+          <Badge variant="danger" className="text-[10px] px-1.5 py-0.5">No Consent</Badge>
         ),
     },
     {
       header: "DND Status",
-      className: "whitespace-nowrap",
+      width: "11%",
       render: (row) =>
-        row.dnd ? <Badge variant="danger">DND Active</Badge> : <Badge variant="default">DND Cleared</Badge>,
+        row.dnd ? <Badge variant="danger" className="text-[10px] px-1.5 py-0.5">DND Active</Badge> : <Badge variant="default" className="text-[10px] px-1.5 py-0.5">DND Cleared</Badge>,
     },
     {
       header: "Source",
-      className: "whitespace-nowrap",
+      width: "12%",
       render: (row) => (
-        <span className="t-caption text-muted">{formatSource(row.source)}</span>
+        <span className="text-xs text-muted truncate block" title={formatSource(row.source)}>
+          {formatSource(row.source)}
+        </span>
       ),
     },
   ];
@@ -166,7 +170,7 @@ export default function Leads() {
     ) : null;
 
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto font-sans">
+    <div className="space-y-5 w-full min-w-0 max-w-full font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

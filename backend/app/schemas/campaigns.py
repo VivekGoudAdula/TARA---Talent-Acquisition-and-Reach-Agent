@@ -77,6 +77,7 @@ class CampaignCreate(BaseModel):
     product_id: str
     entity_type: Literal["lead", "customer"]
     objective: str = Field(min_length=3)
+    test_run_label: str | None = Field(None, max_length=60)
 
 
 class CampaignUpdate(BaseModel):
@@ -87,6 +88,7 @@ class CampaignUpdate(BaseModel):
     product_id: str | None = None
     entity_type: Literal["lead", "customer"] | None = None
     objective: str | None = None
+    test_run_label: str | None = Field(None, max_length=60)
 
 
 class CampaignListItem(BaseModel):
@@ -98,6 +100,7 @@ class CampaignListItem(BaseModel):
     product_name: str
     entity_type: str
     status: str
+    test_run_label: str | None = None
     total_recipients: int
     contacted_count: int
     recipient_counts: dict[str, int] = Field(default_factory=dict)
@@ -119,6 +122,7 @@ class CampaignDetail(BaseModel):
     entity_type: str
     objective: str
     status: str
+    test_run_label: str | None = None
     channels: list[str]
     audience_filter: dict[str, Any] = Field(default_factory=dict)
     include_not_eligible: bool = False
@@ -197,12 +201,19 @@ class CampaignRecipientItem(BaseModel):
     eligibility: str
     status: str
     blocked_reason: str | None = None
+    tester_scenario: str | None = None
     last_communication_id: str | None = None
     attempts: int = 0
     last_contact_at: datetime | None = None
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class RecipientScenarioUpdate(BaseModel):
+    """Payload to assign an expected testing scenario note to a campaign recipient."""
+
+    tester_scenario: str | None = Field(None, max_length=200)
 
 
 class CampaignLaunchRequest(BaseModel):

@@ -199,7 +199,13 @@ export default function Models() {
                 <div>
                   <h3 className="t-label text-muted-soft mb-2">Calibration Reliability (10 Deciles)</h3>
                   <div className="border border-hairline rounded-xl overflow-hidden bg-canvas">
-                    <table className="w-full text-left text-xs">
+                    <table className="w-full text-left text-xs table-fixed border-collapse">
+                      <colgroup>
+                        <col style={{ width: "25%" }} />
+                        <col style={{ width: "25%" }} />
+                        <col style={{ width: "25%" }} />
+                        <col style={{ width: "25%" }} />
+                      </colgroup>
                       <thead className="bg-surface-card border-b border-hairline t-caption text-muted">
                         <tr>
                           <th className="p-2">Decile Bin</th>

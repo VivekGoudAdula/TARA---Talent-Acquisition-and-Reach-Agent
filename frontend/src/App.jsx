@@ -6,14 +6,20 @@ import Layout from "./components/Layout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import DataImport from "./pages/DataImport";
 import Leads from "./pages/Leads";
 import Customers from "./pages/Customers";
 import Products from "./pages/Products";
 import ProductMatches from "./pages/ProductMatches";
+import ExplainableAI from "./pages/ExplainableAI";
 import Models from "./pages/Models";
 import Campaigns from "./pages/Campaigns";
 import CampaignWizard from "./pages/CampaignWizard";
 import CampaignDetail from "./pages/CampaignDetail";
+import LiveMonitor from "./pages/LiveMonitor";
+import Outcomes from "./pages/Outcomes";
+import Governance from "./pages/Governance";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -33,16 +39,22 @@ export default function App() {
           {/* Protected App Routes */}
           <Route path="/app" element={<ProtectedRoute />}>
             <Route element={<Layout />}>
-              <Route index element={<Navigate to="/app/leads" replace />} />
+              <Route index element={<Navigate to="/app/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="data-import" element={<DataImport />} />
               <Route path="leads" element={<Leads />} />
               <Route path="customers" element={<Customers />} />
               <Route path="matches" element={<ProductMatches />} />
+              <Route path="explainable-ai" element={<ExplainableAI />} />
               <Route path="products" element={<Products />} />
               <Route path="models" element={<Models />} />
               <Route path="campaigns" element={<Campaigns />} />
               <Route path="campaigns/new" element={<CampaignWizard />} />
               <Route path="campaigns/:id/edit" element={<CampaignWizard />} />
               <Route path="campaigns/:id" element={<CampaignDetail />} />
+              <Route path="live-monitor" element={<LiveMonitor />} />
+              <Route path="outcomes" element={<Outcomes />} />
+              <Route path="governance" element={<Governance />} />
             </Route>
           </Route>
 

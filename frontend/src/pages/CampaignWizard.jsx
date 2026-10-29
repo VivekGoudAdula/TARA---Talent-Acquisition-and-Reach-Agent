@@ -55,6 +55,7 @@ export default function CampaignWizard() {
           const created = await api.post("/campaigns", {
             name: campaign.name, description: campaign.description, product_id: campaign.product_id,
             entity_type: campaign.entity_type, objective: campaign.objective,
+            test_run_label: campaign.test_run_label || null,
           });
           setCampaign(created);
           navigate(`/app/campaigns/${created.id}/edit`, { replace: true });
@@ -62,6 +63,7 @@ export default function CampaignWizard() {
           const updated = await api.put(`/campaigns/${campaign.id}`, {
             name: campaign.name, description: campaign.description, product_id: campaign.product_id,
             entity_type: campaign.entity_type, objective: campaign.objective,
+            test_run_label: campaign.test_run_label || null,
           });
           setCampaign(updated);
         }

@@ -57,6 +57,22 @@ export default function WizardStep1Details({ data, onChange }) {
           />
         </div>
 
+        {/* Test Run Tag / Label */}
+        <div>
+          <label className="block t-label text-body-strong mb-1.5 flex items-center justify-between">
+            <span>Test Run Tag / Label (Optional)</span>
+            <span className="text-[11px] text-muted font-normal">Used for evidence report isolation</span>
+          </label>
+          <Input
+            type="text"
+            placeholder="e.g., phase5-evidence"
+            value={data.test_run_label || ""}
+            onChange={(e) => onChange("test_run_label", e.target.value)}
+            className="w-full text-sm font-mono"
+            maxLength={60}
+          />
+        </div>
+
         {/* Product Selection */}
         <div>
           <label className="block t-label text-body-strong mb-1.5 flex items-center gap-1.5">

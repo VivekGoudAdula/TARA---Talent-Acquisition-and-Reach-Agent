@@ -19,6 +19,22 @@ export default function WizardStep4ReviewLaunch({ campaign, recipientCount }) {
   const estimatedSeconds = (recipientCount || 0) * delaySeconds;
   const estimatedMinutes = Math.ceil(estimatedSeconds / 60);
 
+  const [testRunLabel, setTestRunLabel] = useState(campaign?.test_run_label || "");
+  const [savingLabel, setSavingLabel] = useState(false);
+
+  const handleSaveLabel = async () => {
+    if (!campaign?.id) return;
+    setSavingLabel(true);
+    try {
+      await api.put(`/campaigns/${campaign.id}`, { test_run_label: testRunLabel.trim() || null });
+      alert("Test run label saved.");
+    } catch (err) {
+      alert(err.message || "Failed to save label");
+    } finally {
+      setSavingLabel(false);
+    }
+  };
+
   const checks = [
     { label: "Audience Selected", ok: (recipientCount || 0) > 0, detail: `${recipientCount || 0} recipient(s) staged` },
     { label: "Target Product Active", ok: true, detail: campaign.product_name },
@@ -102,6 +118,35 @@ export default function WizardStep4ReviewLaunch({ campaign, recipientCount }) {
               <span className="t-body-xs font-mono text-muted">{chk.detail}</span>
             </div>
           ))}
+        </div>
+
+        {/* Test Run Tag Field */}
+        <div className="pt-4 border-t border-hairline space-y-1.5">
+          <label className="block t-label text-xs text-body-strong">
+            Label this campaign as a test run (Optional)
+          </label>
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder="e.g. phase5-evidence"
+              value={testRunLabel}
+              onChange={(e) => setTestRunLabel(e.target.value)}
+              className="text-xs font-mono py-1.5 h-8 flex-1"
+              maxLength={60}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSaveLabel}
+              disabled={savingLabel}
+              className="text-xs shrink-0"
+            >
+              {savingLabel ? "Saving..." : "Save Tag"}
+            </Button>
+          </div>
+          <span className="text-[11px] text-muted block">
+            Isolates communications from this campaign in the outcomes dashboard and evidence reports.
+          </span>
         </div>
       </Card>
 

@@ -83,44 +83,47 @@ export default function Products() {
   const columns = [
     {
       header: "Product Name",
-      className: "t-body-strong text-ink",
+      width: isSuperAdmin ? "30%" : "35%",
       render: (row) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-surface-strong border border-hairline flex items-center justify-center shrink-0">
-            <Package className="w-4 h-4 text-muted" />
+        <div className="flex items-center gap-2.5 truncate">
+          <div className="w-7 h-7 rounded-full bg-surface-strong border border-hairline flex items-center justify-center shrink-0">
+            <Package className="w-3.5 h-3.5 text-muted" />
           </div>
-          <div>
-            <div className="t-body-strong text-ink">{row.name}</div>
-            <div className="t-caption text-muted">{row.description}</div>
+          <div className="truncate">
+            <div className="font-semibold text-ink text-xs truncate" title={row.name}>{row.name}</div>
+            <div className="text-[10px] text-muted truncate" title={row.description}>{row.description}</div>
           </div>
         </div>
       ),
     },
     {
       header: "Category",
-      render: (row) => <Badge variant="purple">{row.category?.replace("_", " ").toUpperCase()}</Badge>,
+      width: isSuperAdmin ? "18%" : "20%",
+      render: (row) => <Badge variant="purple" className="text-[10px] px-1.5 py-0.5">{row.category?.replace("_", " ").toUpperCase()}</Badge>,
     },
     {
       header: "Eligibility Rules",
+      width: isSuperAdmin ? "30%" : "32%",
       render: (row) => {
         const r = row.eligibility_rules || {};
         return (
-          <div className="t-caption text-body space-y-0.5">
-            <div>Min Income: <span className="font-semibold">{formatCurrency(r.min_income)}</span></div>
-            <div>Age: {r.min_age}–{r.max_age} yrs • Max EMI: {(r.max_emi_to_income * 100).toFixed(0)}%</div>
+          <div className="text-xs text-body space-y-0.5 truncate">
+            <div className="truncate">Min Inc: <span className="font-semibold">{formatCurrency(r.min_income)}</span></div>
+            <div className="text-[10px] text-muted truncate">Age: {r.min_age}–{r.max_age} yrs • Max EMI: {(r.max_emi_to_income * 100).toFixed(0)}%</div>
           </div>
         );
       },
     },
     {
       header: "Status",
+      width: isSuperAdmin ? "11%" : "13%",
       render: (row) => (
         <button
           onClick={(e) => isSuperAdmin && handleToggleActive(row, e)}
           disabled={!isSuperAdmin}
           className={`${isSuperAdmin ? "cursor-pointer" : "cursor-default"}`}
         >
-          <Badge variant={row.active ? "success" : "default"}>{row.active ? "Active" : "Inactive"}</Badge>
+          <Badge variant={row.active ? "success" : "default"} className="text-[10px] px-1.5 py-0.5">{row.active ? "Active" : "Inactive"}</Badge>
         </button>
       ),
     },
@@ -128,10 +131,11 @@ export default function Products() {
       ? [
           {
             header: "Action",
+            width: "11%",
             className: "text-right",
             render: (row) => (
-              <Button size="sm" variant="outline" onClick={() => openEditModal(row)}>
-                <Edit2 className="w-3.5 h-3.5 mr-1 text-muted" /> Edit
+              <Button size="sm" variant="outline" onClick={() => openEditModal(row)} className="!py-1 !px-2 text-xs">
+                <Edit2 className="w-3 h-3 mr-1 text-muted" /> Edit
               </Button>
             ),
           },

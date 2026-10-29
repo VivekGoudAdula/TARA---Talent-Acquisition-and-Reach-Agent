@@ -148,17 +148,26 @@ export default function Campaigns() {
             </Button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="w-full overflow-hidden">
+            <table className="w-full text-left border-collapse table-fixed">
+              <colgroup>
+                <col style={{ width: "22%" }} />
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "11%" }} />
+                <col style={{ width: "11%" }} />
+                <col style={{ width: "10%" }} />
+              </colgroup>
               <thead>
-                <tr className="border-b border-hairline bg-surface-strong/50 t-label text-muted">
-                  <th className="py-3 px-4">Campaign Name</th>
-                  <th className="py-3 px-4">Product & Audience</th>
-                  <th className="py-3 px-4">Recipients</th>
-                  <th className="py-3 px-4">Outreach Progress</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Last Updated</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                <tr className="border-b border-hairline bg-surface-strong/50 text-muted text-[11px] font-semibold uppercase tracking-wider">
+                  <th className="py-2 px-2.5">Campaign Name</th>
+                  <th className="py-2 px-2.5">Product & Audience</th>
+                  <th className="py-2 px-2.5">Recipients</th>
+                  <th className="py-2 px-2.5">Outreach Progress</th>
+                  <th className="py-2 px-2.5">Status</th>
+                  <th className="py-2 px-2.5">Last Updated</th>
+                  <th className="py-2 px-2.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-hairline">
@@ -169,44 +178,44 @@ export default function Campaigns() {
 
                   return (
                     <tr key={camp.id} className="hover:bg-surface-strong/30 transition-colors">
-                      <td className="py-3.5 px-4">
-                        <Link to={`/app/campaigns/${camp.id}`} className="font-semibold text-ink hover:underline">
+                      <td className="py-2 px-2.5 truncate">
+                        <Link to={`/app/campaigns/${camp.id}`} className="font-semibold text-ink hover:underline text-xs truncate block" title={camp.name}>
                           {camp.name}
                         </Link>
                       </td>
-                      <td className="py-3.5 px-4">
-                        <div className="t-body-sm text-ink font-medium">{camp.product_name}</div>
-                        <span className="inline-block px-2 py-0.5 mt-0.5 rounded text-[11px] font-mono uppercase bg-surface-strong text-muted">
+                      <td className="py-2 px-2.5 truncate">
+                        <div className="text-xs text-ink font-medium truncate" title={camp.product_name}>{camp.product_name}</div>
+                        <span className="inline-block px-1.5 py-0.2 mt-0.5 rounded text-[10px] font-mono uppercase bg-surface-strong text-muted">
                           {camp.entity_type}s
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 t-body-sm text-ink font-mono font-medium">
+                      <td className="py-2 px-2.5 text-xs text-ink font-mono font-medium">
                         {total}
                       </td>
-                      <td className="py-3.5 px-4 min-w-[160px]">
-                        <div className="flex items-center justify-between t-label text-muted mb-1">
-                          <span>{contacted}/{total} reached</span>
+                      <td className="py-2 px-2.5">
+                        <div className="flex items-center justify-between text-[10px] text-muted mb-0.5">
+                          <span>{contacted}/{total}</span>
                           <span>{pct}%</span>
                         </div>
-                        <div className="w-full h-1.5 rounded-full bg-surface-strong overflow-hidden">
+                        <div className="w-full h-1 rounded-full bg-surface-strong overflow-hidden">
                           <div
                             className="h-full bg-primary rounded-full transition-all duration-300"
                             style={{ width: `${pct}%` }}
                           />
                         </div>
                       </td>
-                      <td className="py-3.5 px-4">
-                        <Badge variant={getStatusVariant(camp.status)}>{camp.status}</Badge>
+                      <td className="py-2 px-2.5">
+                        <Badge variant={getStatusVariant(camp.status)} className="text-[10px] px-1.5 py-0.5">{camp.status}</Badge>
                       </td>
-                      <td className="py-3.5 px-4 t-body-xs text-muted">
+                      <td className="py-2 px-2.5 text-[11px] text-muted font-mono truncate">
                         {formatDate(camp.updated_at)}
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-2 px-2.5 text-right">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => navigate(`/app/campaigns/${camp.id}`)}
-                          className="text-xs"
+                          className="!py-1 !px-2 text-xs"
                         >
                           View <ArrowRight className="w-3 h-3 ml-1" />
                         </Button>

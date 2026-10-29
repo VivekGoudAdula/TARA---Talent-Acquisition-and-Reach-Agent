@@ -8,8 +8,9 @@ export async function apiClient(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
   const token = sessionStorage.getItem("tara_token");
 
+  const isFormData = options.body instanceof FormData;
   const headers = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...(options.headers || {}),
   };
 
@@ -41,6 +42,10 @@ export async function apiClient(endpoint, options = {}) {
       throw new Error(message);
     }
 
+    if (options.responseType === "blob") {
+      return await response.blob();
+    }
+
     return await response.json();
   } catch (err) {
     throw err;
@@ -50,10 +55,22 @@ export async function apiClient(endpoint, options = {}) {
 export const api = {
   get: (endpoint, options) => apiClient(endpoint, { ...options, method: "GET" }),
   post: (endpoint, body, options) =>
-    apiClient(endpoint, { ...options, method: "POST", body: JSON.stringify(body) }),
+    apiClient(endpoint, {
+      ...options,
+      method: "POST",
+      body: body instanceof FormData ? body : JSON.stringify(body),
+    }),
   put: (endpoint, body, options) =>
-    apiClient(endpoint, { ...options, method: "PUT", body: JSON.stringify(body) }),
+    apiClient(endpoint, {
+      ...options,
+      method: "PUT",
+      body: body instanceof FormData ? body : JSON.stringify(body),
+    }),
   patch: (endpoint, body, options) =>
-    apiClient(endpoint, { ...options, method: "PATCH", body: JSON.stringify(body) }),
+    apiClient(endpoint, {
+      ...options,
+      method: "PATCH",
+      body: body instanceof FormData ? body : JSON.stringify(body),
+    }),
   delete: (endpoint, options) => apiClient(endpoint, { ...options, method: "DELETE" }),
 };

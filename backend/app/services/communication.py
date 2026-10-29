@@ -23,6 +23,8 @@ def build_comm_doc(
     req: CommunicationSendRequest, tid: str, uid: str, masked: str, stat: str, now: datetime, **kw: Any,
 ) -> dict[str, Any]:
     """Helper to construct standardized communication document."""
+    meta = req.metadata or {}
+    test_run_label = meta.get("test_run_label")
     return {
         "tenant_id": tid, "channel": req.channel, "recipient_type": req.recipient_ref.type,
         "recipient_id": req.recipient_ref.id, "phone_masked": masked, "campaign_id": req.campaign_id,
@@ -32,6 +34,7 @@ def build_comm_doc(
         "request_variables": req.content.variables, "provider_response_raw": kw.get("provider_response_raw"),
         "outcome": None, "created_by": uid, "created_at": now, "dispatched_at": now if stat == "DISPATCHED" else None,
         "completed_at": None, "updated_at": now,
+        "metadata": meta, "test_run_label": test_run_label,
     }
 
 

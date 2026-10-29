@@ -12,6 +12,11 @@ import {
   X,
   Sparkles,
   Cpu,
+  LayoutDashboard,
+  UploadCloud,
+  HelpCircle,
+  Radio,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { formatRole } from "../utils/format";
@@ -28,92 +33,106 @@ export default function Layout() {
     navigate("/login");
   };
 
-  const navItems = [
-    { name: "Leads", path: "/app/leads", icon: Users },
-    { name: "Customers", path: "/app/customers", icon: UserCheck },
-    { name: "Product Matches", path: "/app/matches", icon: Sparkles },
-    { name: "Products", path: "/app/products", icon: Package },
-    { name: "Campaigns", path: "/app/campaigns", icon: Megaphone },
-    { name: "Models", path: "/app/models", icon: Cpu },
-  ];
+  const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
-  const disabledNavItems = [
-    { name: "Outcomes", icon: BarChart3, badge: "Phase 5" },
+  const navGroups = [
+    {
+      title: "WORKSPACE",
+      items: [{ name: "Dashboard", path: "/app/dashboard", icon: LayoutDashboard }],
+    },
+    {
+      title: "DATA",
+      items: [
+        { name: "Data Import", path: "/app/data-import", icon: UploadCloud },
+        { name: "Leads", path: "/app/leads", icon: Users },
+        { name: "Customers", path: "/app/customers", icon: UserCheck },
+        { name: "Product Catalogue", path: "/app/products", icon: Package },
+      ],
+    },
+    {
+      title: "INTELLIGENCE",
+      items: [
+        { name: "Product Matches", path: "/app/matches", icon: Sparkles },
+        { name: "Explainable AI", path: "/app/explainable-ai", icon: HelpCircle },
+        { name: "ML Monitoring", path: "/app/models", icon: Cpu },
+      ],
+    },
+    {
+      title: "ENGAGEMENT",
+      items: [
+        { name: "Campaigns", path: "/app/campaigns", icon: Megaphone },
+        { name: "Live Monitor", path: "/app/live-monitor", icon: Radio },
+      ],
+    },
+    {
+      title: "HISTORY & GOVERNANCE",
+      items: [
+        { name: "Interaction History", path: "/app/outcomes", icon: BarChart3 },
+        ...(isSuperAdmin
+          ? [{ name: "Governance & Audit", path: "/app/governance", icon: ShieldCheck }]
+          : []),
+      ],
+    },
   ];
 
   const sidebarContent = (
-    <div className="h-full flex flex-col justify-between p-4 bg-canvas text-ink">
-      <div>
-        {/* Brand */}
-        <div className="h-16 px-2 flex items-center justify-between border-b border-hairline mb-4">
-          <NavLink to="/" className="flex items-center">
-            <img
-              src="/logo.png"
-              alt="TARA"
-              className="h-10 w-auto object-contain"
-            />
-          </NavLink>
-          {mobileMenuOpen && (
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden p-1.5 rounded-md hover:bg-surface-strong text-muted"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
-        </div>
+    <div className="h-full flex flex-col justify-between p-3.5 bg-transparent text-ink overflow-hidden">
+      {/* Brand - Fixed */}
+      <div className="h-14 px-2 flex items-center justify-between border-b border-hairline/60 shrink-0 mb-3">
+        <NavLink to="/" className="flex items-center">
+          <img
+            src="/logo.png"
+            alt="TARA"
+            className="h-9 w-auto object-contain"
+          />
+        </NavLink>
+        {mobileMenuOpen && (
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="md:hidden p-1.5 rounded-md hover:bg-white/50 text-muted"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
 
-        {/* Navigation */}
-        <nav className="space-y-1.5">
-          <div className="px-3 py-1.5 t-label text-muted-soft">
-            Audience & Catalog
-          </div>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2 rounded-full t-nav transition-colors ${
-                    isActive
-                      ? "bg-surface-card text-ink border border-hairline shadow-soft"
-                      : "text-body hover:text-ink hover:bg-canvas-soft"
-                  }`
-                }
-              >
-                <Icon className="w-4 h-4 shrink-0 text-muted" />
-                <span>{item.name}</span>
-              </NavLink>
-            );
-          })}
-
-          <div className="pt-6 px-3 py-1.5 t-label text-muted-soft">
-            Voice Outreach
-          </div>
-          {disabledNavItems.map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={idx}
-                className="flex items-center justify-between px-3.5 py-2 rounded-full t-nav text-muted-soft cursor-not-allowed select-none"
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className="w-4 h-4 text-muted-soft" />
-                  <span>{item.name}</span>
-                </div>
-                <span className="t-label px-2 py-0.5 rounded-full bg-surface-strong text-muted-soft border border-hairline">
-                  {item.badge}
-                </span>
+      {/* Navigation - Internal scrollable if vertical height is constrained */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-3 pr-1">
+        <nav className="space-y-3">
+          {navGroups.map((group) => (
+            <div key={group.title}>
+              <div className="px-3 py-0.5 text-[10px] font-semibold tracking-wider text-muted-soft uppercase">
+                {group.title}
               </div>
-            );
-          })}
+              <div className="mt-0.5 space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center gap-2.5 px-3 py-1.5 rounded-full t-nav transition-all duration-150 ${
+                          isActive
+                            ? "bg-white text-ink border border-hairline shadow-sm font-medium"
+                            : "text-body hover:text-ink hover:bg-white/40"
+                        }`
+                      }
+                    >
+                      <Icon className="w-4 h-4 shrink-0 text-muted" />
+                      <span className="text-sm truncate">{item.name}</span>
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
       </div>
 
-      {/* Footer Info */}
-      <div className="px-3 py-3 border-t border-hairline t-caption text-muted flex items-center justify-between">
+      {/* Footer Info - Fixed */}
+      <div className="pt-3 border-t border-hairline/60 t-caption text-muted flex items-center justify-between shrink-0 mt-2">
         <span>Bolna Buildathon</span>
         <span className="t-caption text-muted-soft">v1.6</span>
       </div>
@@ -121,16 +140,16 @@ export default function Layout() {
   );
 
   return (
-    <div className="min-h-screen flex bg-canvas text-ink font-sans">
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-60 bg-canvas border-r border-hairline flex-col shrink-0">
+    <div className="h-screen w-screen overflow-hidden flex bg-canvas text-ink font-sans">
+      {/* Desktop Fixed Sidebar with bg-app.png */}
+      <aside className="hidden md:flex w-60 h-screen sticky top-0 left-0 bg-[url('/bg-app.png')] bg-cover bg-left-top border-r border-hairline/80 flex-col shrink-0 z-30 overflow-hidden shadow-sm">
         {sidebarContent}
       </aside>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden bg-ink/30 backdrop-blur-sm flex">
-          <div className="w-64 bg-canvas h-full border-r border-hairline shadow-xl">
+          <div className="w-64 bg-[url('/bg-app.png')] bg-cover bg-left-top h-full border-r border-hairline/80 shadow-xl">
             {sidebarContent}
           </div>
           <div className="flex-1" onClick={() => setMobileMenuOpen(false)} />
@@ -138,17 +157,17 @@ export default function Layout() {
       )}
 
       {/* Main Container */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Topbar */}
-        <header className="h-14 bg-surface-card border-b border-hairline px-4 md:px-6 flex items-center justify-between shrink-0">
+      <div className="flex-1 flex flex-col h-screen min-w-0 overflow-hidden">
+        {/* Topbar / Navbar Continuation with bg-app.png */}
+        <header className="h-14 bg-[url('/bg-app.png')] bg-cover bg-top border-b border-hairline/80 px-4 md:px-6 flex items-center justify-between shrink-0 z-20 shadow-xs">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-1.5 rounded-md hover:bg-surface-strong text-ink"
+              className="md:hidden p-1.5 rounded-md hover:bg-white/50 text-ink"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-strong border border-hairline t-caption text-body-strong">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 backdrop-blur-sm border border-hairline t-caption text-body-strong shadow-xs">
               <Building2 className="w-3.5 h-3.5 text-muted" />
               <span>{user?.tenant_name || "Workspace"}</span>
             </div>
@@ -156,20 +175,21 @@ export default function Layout() {
 
           {/* User profile & Logout */}
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 t-caption">
+            <div className="hidden sm:flex items-center gap-2 t-caption bg-white/60 backdrop-blur-xs px-2.5 py-1 rounded-full border border-hairline/60">
               <span className="t-body-strong text-ink">{user?.name}</span>
               <Badge variant={user?.role === "SUPER_ADMIN" ? "purple" : "default"}>
                 {formatRole(user?.role)}
               </Badge>
             </div>
 
-            <div className="h-4 w-[1px] bg-hairline hidden sm:block" />
+            <div className="h-4 w-[1px] bg-hairline/80 hidden sm:block" />
 
             <Button
               id="logout-btn"
               variant="outline"
               size="sm"
               onClick={handleLogout}
+              className="bg-white/80 hover:bg-white backdrop-blur-sm border-hairline shadow-xs"
             >
               <LogOut className="w-3.5 h-3.5 text-muted" />
               <span>Sign out</span>
@@ -178,7 +198,7 @@ export default function Layout() {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 min-w-0 bg-canvas">
           <Outlet />
         </main>
       </div>
