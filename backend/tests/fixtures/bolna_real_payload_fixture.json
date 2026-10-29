@@ -1,0 +1,93 @@
+{
+  "_comment": "Realistic Bolna webhook payload modeled after production schema, with all names and phones replaced by fake values.",
+  "id": "mock-bolna-real-exec-001",
+  "agent_id": "mock-agent-id-12345",
+  "batch_id": null,
+  "scheduled_at": null,
+  "answered_by_voice_mail": null,
+  "conversation_duration": 91.0,
+  "total_cost": 4.0,
+  "transcript": "assistant: Hello Aarav Kumar, I am calling from Test Bank regarding our Pre-approved Loan.\nuser: Yes, tell me more.\nassistant: We offer low interest rates and easy terms.\nuser: How much loan can I get? I need 1,00,000.\nassistant: I have noted your interest for 1,00,000. Would you like to apply?\nuser: Yes.",
+  "usage_breakdown": {
+    "llmModel": {
+      "qwen/qwen3.8-27b": {
+        "input": 10174,
+        "output": 443
+      }
+    },
+    "voice_id": "shubh",
+    "synthesizer_provider": "sarvam",
+    "transcriber_duration": 86.8,
+    "transcriber_language": "hi",
+    "transcriber_provider": "sarvam"
+  },
+  "cost_breakdown": {
+    "llm": 0.5,
+    "synthesizer": 1.5,
+    "transcriber": 1.0,
+    "telephony": 1.0
+  },
+  "extracted_data": {
+    "interest_level": "INTERESTED",
+    "preferred_amount": 100000,
+    "preferred_callback_time": "Tomorrow 3 PM",
+    "language_used": "Hindi"
+  },
+  "summary": "Customer expressed interest in loan for 1,00,000.",
+  "error_message": null,
+  "status": "completed",
+  "agent_extraction": null,
+  "workflow_retries": null,
+  "rescheduled_at": null,
+  "custom_extractions": null,
+  "campaign_id": "mock-camp-001",
+  "smart_status": "interested",
+  "user_number": "+919876543210",
+  "agent_number": "+12025550199",
+  "initiated_at": "2026-10-29T10:05:15.036479",
+  "retry_config": null,
+  "retry_count": 0,
+  "retry_history": [],
+  "agent_version_id": "v1",
+  "created_at": "2026-10-29T10:05:11.142724+00:00",
+  "updated_at": "2026-10-29T10:07:18.429494+00:00",
+  "processing_status": "done",
+  "post_processing_phases": [],
+  "billing_settled": true,
+  "lid_data": null,
+  "termination_reason": "unknown",
+  "telephony_data": {
+    "duration": 91.0,
+    "to_number": "+919876543210",
+    "from_number": "+12025550199",
+    "recording_url": null,
+    "hosted_telephony": false,
+    "provider_call_id": "CAmockcallid123456",
+    "call_type": "outbound",
+    "provider": "twilio",
+    "hangup_by": null,
+    "hangup_reason": null
+  },
+  "transfer_call_data": null,
+  "context_details": {
+    "recipient_data": {
+      "tone": "Professional",
+      "language": "hindi",
+      "bank_name": "Test Bank",
+      "lead_name": "Aarav Kumar",
+      "product_name": "Pre-approved Personal Loan",
+      "customer_name": "Aarav Kumar"
+    },
+    "recipient_phone_number": "+919876543210"
+  },
+  "agent_context_details": null,
+  "batch_run_details": null,
+  "provider": "twilio",
+  "latency_data": {
+    "stream_id": 104.87,
+    "time_to_first_audio": 253.48
+  },
+  "tool_call_logs": [],
+  "node_extracted_data": null,
+  "llm_key_source": []
+}

@@ -97,6 +97,7 @@ async def get_outcomes_summary(
 
     attempted = len(comms)
     blocked, dispatched, completed, no_answer, failed = 0, 0, 0, 0, 0
+    dispatched_terminal = 0
     blocked_by_reason: dict[str, int] = {}
     durations: list[float] = []
     latencies: list[float] = []
@@ -114,6 +115,9 @@ async def get_outcomes_summary(
         elif st in ("DISPATCHED", "IN_PROGRESS", "COMPLETED", "NO_ANSWER", "BUSY", "FAILED", "CANCELLED"):
             dispatched += 1
 
+        if st in ("COMPLETED", "NO_ANSWER", "BUSY", "FAILED", "CANCELLED"):
+            dispatched_terminal += 1
+
         if st == "COMPLETED":
             completed += 1
         elif st in ("NO_ANSWER", "BUSY"):
@@ -123,7 +127,7 @@ async def get_outcomes_summary(
 
         out = c.get("outcome") or {}
         dur = out.get("duration_seconds")
-        if dur is not None:
+        if st == "COMPLETED" and dur is not None:
             try:
                 fdur = float(dur)
                 if fdur > 0:
@@ -132,23 +136,26 @@ async def get_outcomes_summary(
                 pass
 
         # Outcome classification
-        ilevel = str(out.get("interest_level") or "").lower().strip()
-        if ilevel:
-            if "not_interested" in ilevel or "not interested" in ilevel:
-                outcome_counts.not_interested += 1
-            elif "interested" in ilevel:
-                outcome_counts.interested += 1
-            elif "callback" in ilevel:
-                outcome_counts.callback += 1
-            else:
-                outcome_counts.other += 1
-        elif st == "COMPLETED":
-            outcome_counts.unknown += 1
+        ilevel = str(out.get("interest_level") or "").strip()
+        ilevel_lower = ilevel.lower()
+        if not ilevel or ilevel_lower in ("not detected", "unknown", "none"):
+            if st == "COMPLETED":
+                outcome_counts.unknown += 1
+        elif ilevel_lower == "interested":
+            outcome_counts.interested += 1
+        elif ilevel_lower == "callback":
+            outcome_counts.callback += 1
+        elif ilevel_lower == "not_interested":
+            outcome_counts.not_interested += 1
+        else:
+            # Unexpected / raw value -> count under Other / Ambiguous
+            outcome_counts.other += 1
 
-        # Extractions tracking
+        # Extractions tracking (count only if value was actually extracted, not 'Not detected')
         if st == "COMPLETED":
             for field_name in extractions_count:
-                if out.get(field_name) is not None and str(out.get(field_name)).strip() != "":
+                val = out.get(field_name)
+                if val is not None and str(val).strip() not in ("", "Not detected"):
                     extractions_count[field_name] += 1
 
         # Language tracking
@@ -174,8 +181,8 @@ async def get_outcomes_summary(
 
     # Webhook delivery summary
     ev_count = await db.webhook_events.count_documents(build_tenant_query(tenant_id))
-    terminal_comms = completed + no_answer + failed + blocked
-    missing = max(0, dispatched - (completed + no_answer + failed))
+    terminal_comms = dispatched_terminal
+    missing = max(0, dispatched - dispatched_terminal)
 
     # Fill rate calculation
     fill_rate = ExtractionFillRate(

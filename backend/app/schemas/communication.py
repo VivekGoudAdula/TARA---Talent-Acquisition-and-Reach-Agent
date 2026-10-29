@@ -51,6 +51,8 @@ class CommunicationOutcome(BaseModel):
     language_used: str | None = None
     transcript: str | list[Any] | None = None
     duration_seconds: float | int | None = None
+    duration_source: str | None = None
+    duration_type: str | None = None
     hangup_reason: str | None = None
     cost: float | None = None
     latency: dict[str, Any] | float | None = None

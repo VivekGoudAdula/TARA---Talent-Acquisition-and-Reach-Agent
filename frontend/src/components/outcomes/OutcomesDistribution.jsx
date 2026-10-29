@@ -101,7 +101,12 @@ export default function OutcomesDistribution({ summary }) {
           <Webhook className="w-4 h-4 text-sky-600 shrink-0" />
           <span>
             <strong className="text-ink font-mono">{wh.communications_with_terminal_status || 0}</strong> of{" "}
-            <strong className="text-ink font-mono">{s.dispatched || 0}</strong> calls reached a terminal status via webhook.
+            <strong className="text-ink font-mono">{s.dispatched || 0}</strong> dispatched calls reached a terminal status via webhook.
+            {(wh.missing_terminal || 0) > 0 && (
+              <span className="ml-1.5 text-amber-600 font-medium">
+                ({wh.missing_terminal} missing)
+              </span>
+            )}
           </span>
         </div>
       </Card>

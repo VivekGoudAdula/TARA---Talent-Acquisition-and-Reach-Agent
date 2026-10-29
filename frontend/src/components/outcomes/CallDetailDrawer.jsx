@@ -163,9 +163,16 @@ export default function CallDetailDrawer({ callId, onClose }) {
             <div className="bg-canvas p-4 rounded-xl border border-hairline">
               <span className="t-label text-muted block mb-1">Duration</span>
               <span className="t-body-strong font-mono text-ink text-xs">
-                {call.outcome?.duration_seconds !== null && call.outcome?.duration_seconds !== undefined
-                  ? `${call.outcome.duration_seconds}s`
-                  : "—"}
+                {call.outcome?.duration_seconds !== null && call.outcome?.duration_seconds !== undefined ? (
+                  <>
+                    <span>{call.outcome.duration_seconds}s</span>
+                    {(call.outcome.duration_source === "derived" || call.outcome.duration_type === "derived") && (
+                      <span className="ml-1 text-[11px] font-sans font-normal text-muted">(derived)</span>
+                    )}
+                  </>
+                ) : (
+                  "—"
+                )}
               </span>
             </div>
           </div>

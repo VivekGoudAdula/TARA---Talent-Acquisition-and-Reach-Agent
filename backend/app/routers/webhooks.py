@@ -119,6 +119,19 @@ async def handle_bolna_webhook(
         existing_outcome = matching_comm.get("outcome") or {}
         new_outcome = mapped_data["outcome"]
         merged_outcome = {**existing_outcome, **{k: v for k, v in new_outcome.items() if v is not None}}
+
+        # If call duration is missing from provider, compute derived duration from event timestamps
+        if not merged_outcome.get("duration_seconds"):
+            start_dt = matching_comm.get("dispatched_at") or matching_comm.get("created_at")
+            if start_dt and isinstance(start_dt, datetime):
+                if start_dt.tzinfo is None:
+                    start_dt = start_dt.replace(tzinfo=timezone.utc)
+                diff = (now_utc - start_dt).total_seconds()
+                if diff > 0:
+                    merged_outcome["duration_seconds"] = round(diff, 1)
+                    merged_outcome["duration_source"] = "derived"
+                    merged_outcome["duration_type"] = "derived"
+
         update_fields["outcome"] = merged_outcome
 
     await db.communications.update_one({"_id": matching_comm["_id"]}, {"$set": update_fields})

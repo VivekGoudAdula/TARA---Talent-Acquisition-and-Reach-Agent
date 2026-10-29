@@ -21,9 +21,15 @@ export default function HeroSection() {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0 filter blur-[8px] scale-105 opacity-85"
         style={{ backgroundImage: "url('/hero.png')" }}
       />
-      {/* Top and Bottom Vignettes for smooth integration */}
-      <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/80 via-white/40 to-transparent pointer-events-none z-0" />
-      <div className="absolute bottom-0 inset-x-0 h-32 sm:h-44 bg-gradient-to-t from-canvas via-canvas/75 to-transparent pointer-events-none z-0" />
+      {/* Top and Bottom Vignettes for smooth integration into canvas (#f5f5f5) */}
+      <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/80 via-white/40 to-transparent pointer-events-none z-10" />
+      <div
+        className="absolute bottom-0 inset-x-0 h-44 sm:h-64 pointer-events-none z-10"
+        style={{
+          background:
+            "linear-gradient(to top, #f5f5f5 0%, rgba(245, 245, 245, 0.95) 20%, rgba(245, 245, 245, 0.7) 50%, rgba(245, 245, 245, 0.25) 80%, transparent 100%)",
+        }}
+      />
 
       <div className="relative z-10 max-w-[1200px] mx-auto px-6 lg:px-8">
         {/* Main Hero Header */}
