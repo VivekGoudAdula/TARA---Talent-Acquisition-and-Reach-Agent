@@ -81,10 +81,27 @@ assistant: हमारी दीवाली होम लोन में ब�
 This was a scripted test to a verified tester, not a customer conversion.
 
 ## Architecture
-```
-CSV import -> Scoring + product matching -> Campaign builder -> Voice configuration
-          -> Communication API -> Provider adapter (Bolna voice) -> Phone
-Bolna webhook -> TARA webhook endpoint -> status, transcript, outcome -> Interaction History
+
+```mermaid
+flowchart TD
+    subgraph Outbound["Outbound Campaign Pipeline"]
+        direction LR
+        A["CSV Import"] --> B["Scoring & Product Matching"]
+        B --> C["Campaign Builder"]
+        C --> D["Voice Configuration"]
+        D --> E["Communication API\n(Compliance Gate)"]
+        E --> F["Provider Adapter\n(Bolna Voice)"]
+        F --> G["Phone Call"]
+    end
+
+    subgraph Inbound["Outcomes Feedback Loop"]
+        direction LR
+        H["Bolna Webhook"] --> I["TARA Webhook Endpoint"]
+        I --> J["Status, Transcript & Outcomes"]
+        J --> K["Interaction History & Audit Log"]
+    end
+
+    G -.->|"Call Events"| H
 ```
 - **Campaign is independent of providers.** It calls the communication service in-process; the communication module never imports campaign code (enforced by a test).
 - **Provider adapters** isolate Bolna field names. WhatsApp, SMS and Email adapters exist as stubs.
