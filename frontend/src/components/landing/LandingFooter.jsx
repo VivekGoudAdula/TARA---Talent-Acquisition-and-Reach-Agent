@@ -38,7 +38,7 @@ export default function LandingFooter() {
       </div>
 
       {/* Main Footer */}
-      <div className="relative z-20 max-w-[1200px] mx-auto px-6 lg:px-8 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
           <Link to="/" className="flex items-center">
             <img src="/logo.png" alt="TARA" className="h-7 w-auto object-contain" />

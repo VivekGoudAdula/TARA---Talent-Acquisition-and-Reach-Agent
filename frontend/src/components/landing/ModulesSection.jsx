@@ -21,7 +21,7 @@ export default function ModulesSection() {
 
   return (
     <section id="modules" className="py-16 lg:py-24 border-t border-hairline bg-canvas">
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-12 items-start">
           
           {/* Left Column: Heading, Highlights, and Module Selector */}

@@ -27,7 +27,7 @@ export default function CapabilitiesSection() {
 
   return (
     <section id="capabilities" className="py-16 lg:py-24 bg-canvas">
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10 lg:mb-12">
           <span className="t-label text-muted-soft block mb-2">Capabilities</span>
           <h2 className="t-display-lg font-bold text-ink">Built for modern lending teams</h2>

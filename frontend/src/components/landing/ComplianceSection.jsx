@@ -11,7 +11,7 @@ export default function ComplianceSection() {
 
   return (
     <section id="compliance" className="py-16 lg:py-24 border-t border-hairline bg-canvas">
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-surface-card border border-hairline rounded-2xl p-8 lg:p-12 shadow-soft">
           <div className="max-w-[760px]">
             <span className="t-label text-muted-soft block mb-3">Governance</span>
