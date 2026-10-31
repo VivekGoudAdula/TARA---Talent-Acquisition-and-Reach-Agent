@@ -16,9 +16,9 @@ export default function HeroSection() {
 
   return (
     <section className="relative isolate overflow-hidden min-h-screen min-h-[100dvh] w-full flex flex-col justify-between pt-20 sm:pt-24 lg:pt-28 pb-6 sm:pb-10 bg-[#d8eef3]">
-      {/* Background Hero Image - Full coverage across all aspect ratios & zoom levels */}
+      {/* Background Hero Image - Full coverage across all aspect ratios with soft blur */}
       <div
-        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none z-0"
+        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none z-0 filter blur-[5px] scale-[1.03]"
         style={{
           backgroundImage: "url('/hero.png')",
           backgroundPosition: "center center",
