@@ -29,13 +29,9 @@ export default function HeroSection() {
       {/* Subtle top vignette for crystal clear navbar legibility */}
       <div className="absolute top-0 inset-x-0 h-20 sm:h-24 bg-gradient-to-b from-white/60 via-white/20 to-transparent pointer-events-none z-10" />
 
-      {/* Soft feather at bottom edge to transition gracefully into canvas (#f5f5f5) on scroll */}
+      {/* Subtle bottom edge blend into canvas (#f5f5f5) */}
       <div
-        className="absolute bottom-0 inset-x-0 h-16 sm:h-24 pointer-events-none z-10"
-        style={{
-          background:
-            "linear-gradient(to top, #f5f5f5 0%, rgba(245, 245, 245, 0.6) 35%, transparent 100%)",
-        }}
+        className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-[#f5f5f5] to-transparent pointer-events-none z-10"
       />
 
       {/* Center Hero Content (vertically centered on any viewport height) */}
