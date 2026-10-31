@@ -175,9 +175,6 @@ TEST_MODE=true by default: only numbers in TEST_ALLOWLIST can be called. Seeded 
 - Test calls were made to verified testers and measure pipeline behaviour, not real-world conversion.
 - Compliance controls are policy checks on the platform's own records. They do not include the national DND registry and are not a regulatory certification.
 
-## Evidence
-EVIDENCE_PLACEHOLDER (to be filled only from the real evidence report: number of test calls, number of testers, scenarios)
-
 ## Author
 Vivek Goud Adula  
 - **Contact**: [adulavivekgoud@gmail.com](mailto:adulavivekgoud@gmail.com)  
