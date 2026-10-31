@@ -133,7 +133,10 @@ export default function Layout() {
 
       {/* Footer Info - Fixed */}
       <div className="pt-3 border-t border-hairline/60 t-caption text-muted flex items-center justify-between shrink-0 mt-2">
-        <span>Bolna Buildathon</span>
+        <span className="inline-flex items-center gap-1.5">
+          <img src="/bolna-logo.png" alt="Bolna" className="h-3.5 w-auto object-contain opacity-80" />
+          <span>Bolna Buildathon</span>
+        </span>
         <span className="t-caption text-muted-soft">v1.6</span>
       </div>
     </div>
