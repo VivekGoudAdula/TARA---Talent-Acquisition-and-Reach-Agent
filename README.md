@@ -2,7 +2,7 @@
 
 <p align="center">Turn customer data into targeted growth: explainable product matching, compliant campaigns, and a voice AI agent that calls in Telugu, Hindi or English.</p>
 
-<p align="center">Built for the Bolna Voice AI Buildathon (Symphony 2026) by Vivek Goud Adula, Ultrion Tech</p>
+<p align="center">Built for the Bolna Voice AI Buildathon (Symphony 2026) by Vivek Goud Adula</p>
 
 ![Landing](docs/screenshots/01-landing.png)
 
@@ -169,4 +169,6 @@ TEST_MODE=true by default: only numbers in TEST_ALLOWLIST can be called. Seeded 
 EVIDENCE_PLACEHOLDER (to be filled only from the real evidence report: number of test calls, number of testers, scenarios)
 
 ## Author
-Vivek Goud Adula, Ultrion Tech. Contact: CONTACT_PLACEHOLDER
+Vivek Goud Adula  
+- **Contact**: [adulavivekgoud@gmail.com](mailto:adulavivekgoud@gmail.com)  
+- **LinkedIn**: [https://www.linkedin.com/in/vivekgoudadula/](https://www.linkedin.com/in/vivekgoudadula/)
