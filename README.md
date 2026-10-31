@@ -61,27 +61,20 @@ Campaign code never imports Bolna. It calls TARA's communication API, which call
 | ![Outcomes](docs/screenshots/11-outcomes.png) **Interaction history** | ![Governance](docs/screenshots/12-governance.png) **Governance and audit** |
 
 ## Live call (real test call)
-A campaign launched from the app placed a real call through Bolna to the author's own verified number. The agent opened in Hindi, then switched to Telugu when the caller replied in Telugu, answered a question about the loan, and recorded the requested amount.
+A campaign launched from the app placed a real call through Bolna to the author's own verified number. The agent opened, verified the identity of the recipient, introduced Indian Bank's Diwali Home Loan offer, and explained interest rates and flexible repayment options.
 
 ![Call transcript](docs/screenshots/10-call-transcript.png)
-*(screenshot pending)*
 
-<details><summary>Transcript (test call, "Dummy Bank", phone number masked; English glosses added)</summary>
+<details><summary>Transcript (test call, "Indian Bank", phone number masked; English glosses added)</summary>
 
 ```
-assistant: Hello Vivek Goud, I am reaching out from Dummy Bank regarding our Festive Loan. Do you have two minutes to speak?
-user: हेलो।
-assistant: नमस्ते, क्या मैं वीवेक गौड़ से बात कर रहा हूँ?   (Hello, am I speaking with Vivek Goud?)
-user: हाँ बोलो।
-assistant: Dummy Bank की ओर से हमारी Festive Loan की जानकारी देना चाहता हूँ। क्या आप इस ऑफर के बारे में जानना चाहेंगे?
-user: ఆ చెప్పండి.   (Yes, go ahead.)
-assistant: మీకు అవసరమైనప్పుడు సులభంగా రుణం పొందవచ్చు. ఈ ఫెస్టివ్ లోన్లో తక్కువ వడ్డీ రేటు మరియు సులభమైన తిరిగి చెల్లింపు ఎంపికలు ఉన్నాయి.
-user: ఎంత లోన్ ఇస్తారు?   (How much loan do you give?)
-assistant: మీ అవసరాలకు అనుగుణంగా రుణ మొత్తం నిర్ణయించబడుతుంది. మీకు ఎంత మొత్తం అవసరం?   (The amount depends on your needs. How much do you need?)
-user: ఐ నీడ్ లోన్ వర్క్. ₹1,00,000
-assistant: మీరు ₹1,00,000 రుణం కోరుకుంటున్నారని నమోదు చేశాను. ఈ ఆఫర్కు అప్లై చేయడానికి మీకు ఆసక్తి ఉందా?   (I have noted you want Rs 1,00,000. Are you interested in applying?)
-user: ఆ.
-assistant: మీరు అప్లై చేయడానికి ఆసక్తి చూపినందుకు ధన్యవాదాలు.   (Thank you for your interest in applying.)
+assistant: Hello Vivek Goud Adula, I am reaching out from Indian Bank regarding our Diwali Home Loan. Do you have two minutes to speak?
+user: हाँ बोलो।   (Yes, tell me.)
+assistant: क्या मैं सच में Vivek Goud Adula से बात कर रहा हूँ?   (Am I really speaking with Vivek Goud Adula?)
+user: हाँ, मैं विवेक हूँ।   (Yes, I am Vivek.)
+assistant: बहुत अच्छा, विवेक जी। हमारी दीवाली होम लोन ऑफर में आपकी रुचि है क्या?   (Very good, Vivek ji. Are you interested in our Diwali Home Loan offer?)
+user: हाँ, उसके बारे में बोलो।   (Yes, tell me about it.)
+assistant: हमारी दीवाली होम लोन में बेहतरीन ब्याज दर और लचीली किस्त चुकौती सुविधा उपलब्ध है। क्या आप इस ऑफर के लिए आवेदन करने में रुचि रखते हैं?   (Our Diwali Home Loan has excellent interest rates and flexible installment repayment options available. Are you interested in applying for this offer?)
 ```
 </details>
 
