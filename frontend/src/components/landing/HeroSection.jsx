@@ -15,25 +15,31 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative isolate overflow-hidden pt-28 pb-16 lg:pt-36 lg:pb-24">
-      {/* Blurred Background Hero Image (Static, zero animation) */}
+    <section className="relative isolate overflow-hidden min-h-screen min-h-[100dvh] w-full flex flex-col justify-between pt-24 pb-8 lg:pb-12 bg-[#d8eef3]">
+      {/* Background Hero Image - Full coverage across all aspect ratios & zoom levels */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0 filter blur-[8px] scale-105 opacity-85"
-        style={{ backgroundImage: "url('/hero.png')" }}
-      />
-      {/* Top and Bottom Vignettes for smooth integration into canvas (#f5f5f5) */}
-      <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/80 via-white/40 to-transparent pointer-events-none z-10" />
-      <div
-        className="absolute bottom-0 inset-x-0 h-44 sm:h-64 pointer-events-none z-10"
+        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none z-0"
         style={{
-          background:
-            "linear-gradient(to top, #f5f5f5 0%, rgba(245, 245, 245, 0.95) 20%, rgba(245, 245, 245, 0.7) 50%, rgba(245, 245, 245, 0.25) 80%, transparent 100%)",
+          backgroundImage: "url('/hero.png')",
+          backgroundPosition: "center center",
         }}
       />
 
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 lg:px-8">
-        {/* Main Hero Header */}
-        <div className="text-center max-w-[880px] mx-auto mb-12 lg:mb-16">
+      {/* Subtle top vignette for crystal clear navbar legibility */}
+      <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/60 via-white/20 to-transparent pointer-events-none z-10" />
+
+      {/* Soft feather at bottom edge to transition gracefully into canvas (#f5f5f5) on scroll */}
+      <div
+        className="absolute bottom-0 inset-x-0 h-20 sm:h-28 pointer-events-none z-10"
+        style={{
+          background:
+            "linear-gradient(to top, #f5f5f5 0%, rgba(245, 245, 245, 0.7) 40%, transparent 100%)",
+        }}
+      />
+
+      {/* Center Hero Content (vertically centered on any viewport height) */}
+      <div className="relative z-20 max-w-[1200px] w-full mx-auto px-6 lg:px-8 my-auto py-8 text-center flex flex-col items-center">
+        <div className="max-w-[880px] mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface-card/90 backdrop-blur-sm border border-hairline t-label text-body mb-5 shadow-soft">
             <span className="w-1.5 h-1.5 rounded-full bg-semantic-success" />
             <span>Enterprise customer intelligence for lenders</span>
@@ -58,9 +64,11 @@ export default function HeroSection() {
             </Button>
           </div>
         </div>
+      </div>
 
-        {/* Hero Proof Strip (4 factual capability tags, no numbers except language count) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-w-[980px] mx-auto">
+      {/* Bottom Proof Strip (anchored nicely above the fold) */}
+      <div className="relative z-20 max-w-[1020px] w-full mx-auto px-6 lg:px-8 pb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {proofTags.map((tag, idx) => {
             const Icon = tag.icon;
             return (
