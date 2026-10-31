@@ -25,6 +25,32 @@ Banks and lenders hold millions of customers and leads, but outreach is manual, 
 5. **Launch through a communication API**: the campaign never talks to a telephony provider. It calls a reusable communication service, which calls Bolna.
 6. **Capture outcomes**: status timeline, transcript and structured fields land in Interaction History.
 
+## Why Bolna
+
+TARA decides who to call, for which product, and what to say. Bolna is the voice engine that makes the call. We chose Bolna because it let us spend the build time on the lending workflow instead of audio plumbing.
+
+| What we needed | What Bolna gave us | How TARA uses it |
+|---|---|---|
+| Indian languages on a real phone call | Hindi and Telugu with mid-call language switching, plus Sarvam speech models that can be connected on your own account | The agent opens in a customer's stored language and followed the caller from Hindi into Telugu in a real test call |
+| One agent, many campaigns | Per-call dynamic variables (`user_data`) that fill the agent prompt and welcome message | One Bolna agent serves every campaign. Each campaign's objective, questions, tone and opening line are sent as variables, so prompts are configuration, not code |
+| Bring your own stack | Telephony, speech and LLM providers connected with your own keys (we used Twilio, Sarvam and an LLM via Groq) | We could pick models for Indic languages and swap them without touching TARA code |
+| Results back into our product | Call webhooks with status events and transcripts, plus configurable extractions | The webhook feeds TARA's status timeline and transcript; extractions populate interest, amount and callback time when configured |
+| Guardrails for outbound calling | Call timeouts, silence hang-up and calling guardrails | These sit under TARA's own checks (consent, DND flag, calling hours, frequency cap), which run before any call is dispatched |
+| Speed to a working demo | A hosted agent studio and a simple REST call (`POST /call`) | A working voice loop in the first day, which left the rest of the time for scoring, campaigns and governance |
+| A path past the demo | Bulk calling, batches, retries, workflows and India data-residency options in their docs | Not used in this build. These are the route to scale in a pilot |
+
+### Why not build the voice stack ourselves
+Real-time speech-to-text, LLM reasoning, speech synthesis, telephony, interruption handling and latency tuning are a product on their own. Building them in a few days would have meant a worse voice agent and no time for the lending workflow. TARA's value is the intelligence before the call and the controls around it.
+
+### How the decoupling works
+Campaign code never imports Bolna. It calls TARA's communication API, which calls a provider adapter. Bolna-specific field names live in two files only: `backend/app/providers/bolna_voice.py` and `backend/app/providers/bolna_webhook_mapper.py`. Replacing or adding a voice provider means writing another adapter, not changing campaigns.
+
+### Honest limits
+- We used Bolna on a trial plan with verified numbers only, so results are from test calls, not production traffic.
+- Latency and cost per call are visible in Bolna's dashboard but are not part of its webhook payload, so TARA's dashboard shows them as unavailable.
+- Structured extraction depends on the Extractions configured in the Bolna agent.
+- We have not benchmarked Bolna against other voice platforms, and we make no claim that it is better than them. It was the best fit for Indian languages, fast setup and our own-keys architecture.
+
 ## Screenshots
 | | |
 |---|---|
