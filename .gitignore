@@ -17,7 +17,7 @@ build/
 .DS_Store
 Thumbs.db
 
-# Scratch and temp scripts
+# Scratch, temp, logs and test artifacts
 scratch/
 frontend/capture_*.mjs
 capture_*.mjs
@@ -25,5 +25,9 @@ capture_*.mjs
 *.temp
 *temp*.csv
 *sample*.csv
+*.log
+playwright-report/
+test-results/
+blob-report/
 
 

@@ -110,6 +110,8 @@ async def test_compliance_rules(monkeypatch):
             assert r.status_code == 200 and r.json()["blocked_reason"] == "outside_calling_hours"
 
             monkeypatch.setattr("app.services.compliance.datetime", type("MockDT", (), {"now": lambda tz=None: valid_time}))
+            monkeypatch.setattr(settings, "contact_cap_count", 2)
+            monkeypatch.setattr(settings, "contact_cap_days", 7)
 
             # Frequency cap check
             lid_cap = await create_test_lead(db, tb_tid)

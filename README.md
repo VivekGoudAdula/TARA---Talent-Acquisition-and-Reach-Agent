@@ -117,6 +117,11 @@ MONGO_URI, MONGO_DB_NAME, MONGO_DB_NAME_TEST, SECRET_KEY, SEED_PASSWORD, BOLNA_A
 ### Safe testing
 TEST_MODE=true by default: only numbers in TEST_ALLOWLIST can be called. Seeded and sample numbers are fake and non-dialable. Trial telephony accounts can only call verified numbers.
 
+### Developer scripts
+- `backend/scripts/dev/dry_demonstration.py`: End-to-end campaign creation and mocked dispatch demonstration through the API.
+- `backend/scripts/dev/sync_tenants.py`: Developer utility to sync tenants with test numbers and refreshed scores.
+- `backend/scripts/dev/upsert_test_user.py`: Developer utility to upsert a verified test recipient into a target tenant workspace.
+
 ## What is built vs roadmap
 | Built | Roadmap |
 |---|---|

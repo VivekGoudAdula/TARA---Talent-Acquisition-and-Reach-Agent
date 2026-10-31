@@ -5,8 +5,10 @@ from datetime import datetime, timezone
 import os
 import sys
 
-# Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Add backend root directory to path
+BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
 
 from app.core.config import settings
 from app.core.db import get_db, init_db
