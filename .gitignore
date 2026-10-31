@@ -1,6 +1,6 @@
 # Git ignore rules for TARA
 .env
-.env.local
+.env.*
 .venv
 venv/
 env/
@@ -16,3 +16,14 @@ build/
 *.egg-info/
 .DS_Store
 Thumbs.db
+
+# Scratch and temp scripts
+scratch/
+frontend/capture_*.mjs
+capture_*.mjs
+*.tmp
+*.temp
+*temp*.csv
+*sample*.csv
+
+

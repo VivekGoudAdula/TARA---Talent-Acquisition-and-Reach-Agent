@@ -1,184 +1,141 @@
-# TARA — Targeted Acquisition & Reach Agent
+<p align="center"><b>TARA</b><br/>Targeted Acquisition and Reach Agent</p>
 
-> Voice-first outreach platform for Indian banks & NBFCs, powered by Bolna Voice AI.
+<p align="center">Turn customer data into targeted growth: explainable product matching, compliant campaigns, and a voice AI agent that calls in Telugu, Hindi or English.</p>
 
----
+<p align="center">Built for the Bolna Voice AI Buildathon (Symphony 2026) by Vivek Goud Adula, Ultrion Tech</p>
 
-## Architecture & Routes
+![Landing](docs/screenshots/01-landing.png)
 
-| Path | Access | Description |
-|---|---|---|
-| `/` | Public | Editorial landing page explaining workflow, governance, and status |
-| `/login` | Public | Split-layout authentication with show/hide password toggle |
-| `/signup` | Public | Self-serve workspace creation (initializes clean with 0 records) |
-| `/app` | Protected | Redirects to `/app/leads` |
-| `/app/leads` | Protected | Tenant-isolated lead registry with search, filters, and detail drawer |
-| `/app/customers` | Protected | Internal banking customer portfolio with health scores & repayment behavior |
-| `/app/products` | Protected | Tenant financial products catalog with eligibility criteria |
+## Links
+| | |
+|---|---|
+| Demo video | [Demo Video (Google Drive)](https://drive.google.com/file/d/1qJCyOLtEc8ge0G4SxX1oy9rWJU2sUitC/view?usp=drive_link) |
+| Pitch deck | [Pitch Deck (Canva)](https://canva.link/v2xhqg6o7zwfm2i) |
+| X / social post | [X / Social Post](https://x.com/VivekGoudAdula/status/2116190642263273747) |
+| Live app | [https://tara-bolna.vercel.app/](https://tara-bolna.vercel.app/) |
 
----
+## The problem
+Banks and lenders hold millions of customers and leads, but outreach is manual, channels are fragmented, and compliance is left to individual scripts. Teams call everyone, so contact quality is low. The challenge is not having customers; it is activating the right ones, for the right product, in their own language.
 
-## Environment Setup
+## What TARA does
+1. **Import** customers or leads from CSV (validated, deduplicated, consent-aware) or load sample data.
+2. **Score and match**: every customer and lead is scored against every product, with reason codes and policy eligibility checks. One lead can match many products. Lower scores are never deleted.
+3. **Build a campaign**: choose a product, filter the audience by High / Medium / Low fit, score range and eligibility, and see who would be blocked by compliance before anything is dialled.
+4. **Configure the voice agent**: prompt addendum, opening line, questions to collect, success condition, fallback and retry policy are stored as versioned configuration, not hard-coded.
+5. **Launch through a communication API**: the campaign never talks to a telephony provider. It calls a reusable communication service, which calls Bolna.
+6. **Capture outcomes**: status timeline, transcript and structured fields land in Interaction History.
 
-### 1. Backend Configuration
-Copy `.env.example` to `backend/.env`:
+## Screenshots
+| | |
+|---|---|
+| ![Dashboard](docs/screenshots/02-dashboard.png) **Dashboard** with a getting-started checklist driven by real state | ![Data import](docs/screenshots/03-data-import.png) **Data import**: CSV, sample data, database connectors (roadmap) |
+| ![Validation](docs/screenshots/04-import-validation.png) **Validation preview**: rejects, duplicates, consent flags; nothing is written until confirmed | ![Matches](docs/screenshots/05-product-matches.png) **Product matches** across all products |
+| ![Why](docs/screenshots/06-why-panel.png) **Why panel**: reasons and eligibility checks for each match | ![Audience](docs/screenshots/07-campaign-audience.png) **Audience builder**: band, score, eligibility; compliance preview |
+| ![Voice config](docs/screenshots/08-voice-config.png) **Voice configuration** with live preview | ![Campaign](docs/screenshots/09-campaign-detail.png) **Campaign detail**: live recipient status |
+| ![Outcomes](docs/screenshots/11-outcomes.png) **Interaction history** | ![Governance](docs/screenshots/12-governance.png) **Governance and audit** |
+
+## Live call (real test call)
+A campaign launched from the app placed a real call through Bolna to the author's own verified number. The agent opened in Hindi, then switched to Telugu when the caller replied in Telugu, answered a question about the loan, and recorded the requested amount.
+
+![Call transcript](docs/screenshots/10-call-transcript.png)
+*(screenshot pending)*
+
+<details><summary>Transcript (test call, "Dummy Bank", phone number masked; English glosses added)</summary>
+
+```
+assistant: Hello Vivek Goud, I am reaching out from Dummy Bank regarding our Festive Loan. Do you have two minutes to speak?
+user: हेलो।
+assistant: नमस्ते, क्या मैं वीवेक गौड़ से बात कर रहा हूँ?   (Hello, am I speaking with Vivek Goud?)
+user: हाँ बोलो।
+assistant: Dummy Bank की ओर से हमारी Festive Loan की जानकारी देना चाहता हूँ। क्या आप इस ऑफर के बारे में जानना चाहेंगे?
+user: ఆ చెప్పండి.   (Yes, go ahead.)
+assistant: మీకు అవసరమైనప్పుడు సులభంగా రుణం పొందవచ్చు. ఈ ఫెస్టివ్ లోన్లో తక్కువ వడ్డీ రేటు మరియు సులభమైన తిరిగి చెల్లింపు ఎంపికలు ఉన్నాయి.
+user: ఎంత లోన్ ఇస్తారు?   (How much loan do you give?)
+assistant: మీ అవసరాలకు అనుగుణంగా రుణ మొత్తం నిర్ణయించబడుతుంది. మీకు ఎంత మొత్తం అవసరం?   (The amount depends on your needs. How much do you need?)
+user: ఐ నీడ్ లోన్ వర్క్. ₹1,00,000
+assistant: మీరు ₹1,00,000 రుణం కోరుకుంటున్నారని నమోదు చేశాను. ఈ ఆఫర్కు అప్లై చేయడానికి మీకు ఆసక్తి ఉందా?   (I have noted you want Rs 1,00,000. Are you interested in applying?)
+user: ఆ.
+assistant: మీరు అప్లై చేయడానికి ఆసక్తి చూపినందుకు ధన్యవాదాలు.   (Thank you for your interest in applying.)
+```
+</details>
+
+This was a scripted test to a verified tester, not a customer conversion.
+
+## Architecture
+```
+CSV import -> Scoring + product matching -> Campaign builder -> Voice configuration
+          -> Communication API -> Provider adapter (Bolna voice) -> Phone
+Bolna webhook -> TARA webhook endpoint -> status, transcript, outcome -> Interaction History
+```
+- **Campaign is independent of providers.** It calls the communication service in-process; the communication module never imports campaign code (enforced by a test).
+- **Provider adapters** isolate Bolna field names. WhatsApp, SMS and Email adapters exist as stubs.
+- **Multi-tenant isolation:** tenant_id comes only from the JWT; cross-tenant access returns 404.
+- **Compliance gate at dispatch:** TEST_MODE allowlist, consent required, DND flag, calling-hour window (default 09:00 to 21:00 IST), contact-frequency cap, duplicate in-flight check. Blocked attempts are stored with the reason.
+- **Audit log** of sends, blocks, webhooks, imports, scoring runs, exports and campaign actions.
+
+### Scoring and explainability
+- Eligibility is deterministic policy rules from the product catalogue, shown check by check. Propensity is a logistic-regression fit score. The model ranks fit and never decides eligibility or credit; a human approves every offer.
+- Explanations are exact: contributions come from the model's own coefficients, with template-based reason text. No LLM generates reasons.
+- Models run at inference from committed JSON artifacts in pure Python.
+- Language, city, age, gender and name are excluded from model features; age is used only as an eligibility rule.
+- **The models are trained on synthetic data.** Metrics demonstrate the pipeline, not real-world performance. A pilot would retrain on the lender's own conversion history.
+
+### What data reaches the voice stack
+The voice provider receives only what the call needs: first name, bank name, product name, language, tone and the configured prompt text. Income, scores, bands, eligibility and reason codes are not sent (enforced by a test). Call audio and transcripts are processed by Bolna and its configured speech, LLM and telephony providers; review their terms before any production use.
+
+## Tech stack
+FastAPI, Python, MongoDB (Atlas), React + Vite + Tailwind, JWT auth. Voice: Bolna agent with Twilio telephony, Sarvam speech, and an LLM via Groq (configured in the Bolna dashboard).
+
+## Quick start
+Prerequisites: Python 3.11+, Node 18+, a MongoDB URI, a Bolna account (only needed for real calls).
 ```bash
-cp backend/.env.example backend/.env
-```
-Key configuration in `backend/.env`:
-```env
-MONGO_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/?retryWrites=true&w=majority
-MONGO_DB_NAME=tara
-SECRET_KEY=your-32-char-random-jwt-secret-key
-JWT_EXPIRE_MINUTES=480
-SEED_PASSWORD=ChangeMe123!
-```
-
-### 2. Frontend Configuration
-Copy `.env.example` to `frontend/.env`:
-```bash
-cp frontend/.env.example frontend/.env
-```
-Key configuration in `frontend/.env`:
-```env
-VITE_API_URL=http://localhost:8000/api
-# Set to true to show quick one-click demo login buttons on /login (default: false)
-VITE_SHOW_DEMO_LOGINS=false
-```
-
----
-
-## Running the Application
-
-### 1. Install & Seed Backend
-```bash
+# backend
 cd backend
-python -m pip install -r requirements.txt
-
-# Run idempotent database seeder
+pip install -r requirements.txt
+cp .env.example .env        # fill in values; never commit .env
 python scripts/seed.py
-
-# Optional: wipe and reseed cleanly
-python scripts/seed.py --reset
-```
-
-### 2. Start Backend API Server
-```bash
-cd backend
 python -m uvicorn app.main:app --reload --port 8000
-```
-- API Base: `http://localhost:8000/api`
-- Health Check: `http://localhost:8000/api/health`
-- Interactive API Docs: `http://localhost:8000/docs`
 
-### 3. Start Frontend UI
-```bash
+# frontend
 cd frontend
 npm install
-npm run dev
+cp .env.example .env
+npm run dev                 # http://localhost:5173
 ```
-- Web Application: `http://localhost:5173`
+Run tests (uses a separate test database): `cd backend && python -m pytest`
 
----
+### Environment variables (names only; see backend/.env.example)
+MONGO_URI, MONGO_DB_NAME, MONGO_DB_NAME_TEST, SECRET_KEY, SEED_PASSWORD, BOLNA_API_KEY, BOLNA_AGENT_ID, BOLNA_FROM_NUMBER, BOLNA_WEBHOOK_SECRET, TEST_MODE, TEST_ALLOWLIST, CALL_WINDOW_START, CALL_WINDOW_END, CONTACT_CAP_COUNT, CONTACT_CAP_DAYS, PUBLIC_BASE_URL, CAMPAIGN_MAX_RECIPIENTS, CAMPAIGN_MAX_CONCURRENT, CAMPAIGN_DISPATCH_DELAY_SECONDS.
 
-## Self-Serve Workspace Signup & Sample Data
+### Bolna agent setup (required for campaign calls)
+1. Create a Bolna agent (cascaded engine, Twilio telephony, Sarvam voice and transcription, an LLM of your choice).
+2. Set the welcome message to `{{opening_message}}`.
+3. In the Conversation Flow include these variables: `{{objective}}`, `{{system_prompt_addendum}}`, `{{conversation_steps}}`, `{{tone}}`, `{{questions_to_collect}}`, `{{success_condition}}`, `{{fallback_behaviour}}`.
+4. In the Extractions tab add `interest_level`, `preferred_amount`, `preferred_callback_time`, `language_used`.
+5. Set the webhook URL to `<PUBLIC_BASE_URL>/api/webhooks/bolna` with header `X-Webhook-Secret` equal to BOLNA_WEBHOOK_SECRET. Use a tunnel (ngrok or cloudflared) for local development.
 
-1. Visit `http://localhost:5173/signup` to register a new workspace.
-2. New workspaces initialize completely empty (0 leads, 0 customers, 0 products).
-3. If logged in as `SUPER_ADMIN`, click the **"Load sample data"** button on the empty state of Leads, Customers, or Products to populate verified test records (3 products, 40 leads, 20 customers).
-4. Subsequent calls to sample-data return `409 Conflict` (idempotent protection).
+### Safe testing
+TEST_MODE=true by default: only numbers in TEST_ALLOWLIST can be called. Seeded and sample numbers are fake and non-dialable. Trial telephony accounts can only call verified numbers.
 
----
+## What is built vs roadmap
+| Built | Roadmap |
+|---|---|
+| CSV import with validation, dedupe, consent attestation | Database connectors |
+| Explainable product matching (synthetic-data models) | Retraining on a lender's real outcomes; feedback loop into scoring |
+| Campaign builder, voice configuration, preview, launch, pause/resume | Automatic scheduled retries |
+| Voice calls via Bolna (Hindi, Telugu, English) | WhatsApp, SMS, Email execution (config UI and stubs only) |
+| Consent, DND flag, calling-hour window, frequency cap, audit log | National DND/NDNC registry integration |
+| Tenant isolation, role-based access | Fine-grained permission editor |
+| Outcomes dashboard: status timeline, transcript | See Known limitations |
 
-## Pre-seeded Credentials (for Testing Multi-Tenancy)
+## Known limitations
+- Structured extraction fields (interest level, amount, callback time) depend on Bolna Extractions configuration and are not yet populated reliably; the transcript and status timeline are.
+- Call latency and cost are not provided in Bolna's webhook payload, so the dashboard shows them as unavailable.
+- Test calls were made to verified testers and measure pipeline behaviour, not real-world conversion.
+- Compliance controls are policy checks on the platform's own records. They do not include the national DND registry and are not a regulatory certification.
 
-| Tenant | Role | Email | Password | Dataset Scoped |
-|---|---|---|---|---|
-| **Test Bank** | `SUPER_ADMIN` | `admin@testbank.com` | `ChangeMe123!` | 60 Leads, 30 Customers, 3 Products |
-| **Test Bank** | `EMPLOYEE` | `employee@testbank.com` | `ChangeMe123!` | 60 Leads, 30 Customers, 3 Products |
-| **Other Bank** | `EMPLOYEE` | `employee@otherbank.com` | `ChangeMe123!` | 15 Leads, 10 Customers, 2 Products |
+## Evidence
+EVIDENCE_PLACEHOLDER (to be filled only from the real evidence report: number of test calls, number of testers, scenarios)
 
----
-
-## Running Automated Tests
-
-Run the full isolation, signup, sample data, and communication test suites:
-```bash
-cd backend
-python -m pytest -v
-```
-
-### Verified Test Cases:
-1. `test_tenant_isolation`: Standard Phase 1 isolation (Test Bank: 60/30, Other Bank: 15/10, cross-tenant 404, 401 on tampered token).
-2. `test_signup_creates_isolated_empty_tenant`: New signup creates a fresh workspace with 0 records; cross-tenant records remain invisible.
-3. `test_signup_field_tampering_prevented`: Extra payload fields (`role`, `tenant_id`) cannot escalate privileges or hijack tenant scoping.
-4. `test_signup_validation`: Duplicate email returns `409`; passwords under 10 characters return `422`.
-5. `test_rate_limiting`: Exceeding 10 requests per minute per IP returns `429 Too Many Requests`.
-6. `test_sample_data_loading`: Sample data loads for `SUPER_ADMIN`, returns `403` for `EMPLOYEE`, returns `409` on subsequent calls.
-7. `test_communication`: Full Phase 2 test suite covering dispatch, 7 compliance rules, mock Bolna transport, idempotency, monotonic webhooks, out-of-order reconciliation, and provider error handling.
-
----
-
-## Phase 2: Bolna Voice Agent & Webhook Setup
-
-### 1. Exposing Local Backend with a Tunnel
-To allow Bolna to deliver webhook callbacks to your local development environment, expose port 8000 using Cloudflare Tunnel or ngrok:
-
-**Using Cloudflare Tunnel (cloudflared):**
-```bash
-cloudflared tunnel --url http://localhost:8000
-```
-
-**Using ngrok:**
-```bash
-ngrok http 8000
-```
-
-Copy the generated public HTTPS URL (e.g., `https://abc-123.trycloudflare.com`) and update `backend/.env`:
-```env
-PUBLIC_BASE_URL=https://abc-123.trycloudflare.com
-```
-
-### 2. Bolna Agent Webhook Configuration
-In your Bolna Dashboard (`https://platform.bolna.ai`):
-1. Navigate to your Agent -> **Extractions** / **Webhook** tab.
-2. Configure **Webhook URL**:
-   ```
-   https://<your-public-tunnel-domain>/api/webhooks/bolna
-   ```
-   (e.g., `https://abc-123.trycloudflare.com/api/webhooks/bolna`)
-3. Under **Add Headers**, configure:
-   - Header Key: `X-Webhook-Secret`
-   - Header Value: `<value of BOLNA_WEBHOOK_SECRET from your backend/.env>`
-
-### 3. Running Guarded Manual Test Calls
-Before running a live test call, ensure `TEST_MODE=true` and your verified phone number is set in `TEST_ALLOWLIST` in `backend/.env`.
-```bash
-cd backend
-python scripts/manual_test_call.py
-```
-This script will authenticate as `employee@testbank.com`, pick the allowlisted lead, trigger `POST /api/communication/send`, and poll `GET /api/communications/{id}` for live outcome updates.
-
----
-
-## Phase 4: Bolna Agent Prompt Variables Required
-
-For campaign voice configuration to dynamically control the voice agent during outbound calls, the Bolna agent's prompt in the Bolna platform must include these `{{variables}}` inside its **Conversation Flow** / **Agent Prompt**.
-
-### Required Template Variables
-- `{{opening_message}}` - The personalized opening greeting and introduction.
-- `{{objective}}` - The specific campaign conversation goal.
-- `{{system_prompt_addendum}}` - Additional tone and compliance instructions.
-- `{{questions_to_collect}}` - Formatted structured fields for the agent to collect.
-- `{{success_condition}}` - Criteria defining successful conversation completion.
-- `{{fallback_behaviour}}` - What the agent should do if objections or hurdles arise.
-- `{{tone}}` - Tone setting (Professional, Friendly, or Formal).
-- `{{language}}` - Target language for the conversation.
-- `{{product_name}}` - Offered product name.
-- `{{bank_name}}` - Lending institution name.
-
-### Ready-to-Paste Block for Bolna Agent's Conversation Flow
-```text
-Opening: {{opening_message}}. Objective: {{objective}}. Additional instructions: {{system_prompt_addendum}}. Collect these one at a time: {{questions_to_collect}}. Success means: {{success_condition}}. If something goes wrong: {{fallback_behaviour}}. Tone: {{tone}}.
-```
-
+## Author
+Vivek Goud Adula, Ultrion Tech. Contact: CONTACT_PLACEHOLDER
