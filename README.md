@@ -1,8 +1,29 @@
-<p align="center"><b>TARA</b><br/>Targeted Acquisition and Reach Agent</p>
+<div align="center">
 
-<p align="center">Turn customer data into targeted growth: explainable product matching, compliant campaigns, and a voice AI agent that calls in Telugu, Hindi or English.</p>
+  <h1>TARA</h1>
+  <h3>Targeted Acquisition and Reach Agent</h3>
 
-<p align="center">Built for the <picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/bolna-logo-white.png"><img alt="Bolna" src="docs/assets/bolna-logo-dark.png" height="18" align="center" style="vertical-align: middle;"></picture> <b>Bolna Voice AI Buildathon</b> (Symphony 2026) by Vivek Goud Adula</p>
+  <p>
+    Turn customer data into targeted growth: explainable product matching, compliant campaigns, and a voice AI agent that calls in Telugu, Hindi or English.
+  </p>
+
+  <p>
+    Built for the 
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/bolna-logo-white.png">
+      <img alt="Bolna" src="docs/assets/bolna-logo-dark.png" height="22" style="vertical-align: middle;">
+    </picture>
+    <b>Bolna Voice AI Buildathon</b> (Symphony 2026) &nbsp;&bull;&nbsp; by <b>Vivek Goud Adula</b>
+  </p>
+
+  <p>
+    <a href="https://tara-bolna.vercel.app/"><b>Live App</b></a> &nbsp;&bull;&nbsp;
+    <a href="https://drive.google.com/file/d/1qJCyOLtEc8ge0G4SxX1oy9rWJU2sUitC/view?usp=drive_link"><b>Demo Video</b></a> &nbsp;&bull;&nbsp;
+    <a href="https://canva.link/v2xhqg6o7zwfm2i"><b>Pitch Deck</b></a> &nbsp;&bull;&nbsp;
+    <a href="https://x.com/VivekGoudAdula/status/2116190642263273747"><b>X Post</b></a>
+  </p>
+
+</div>
 
 ![Landing](docs/screenshots/01-landing.png)
 
@@ -25,11 +46,11 @@ Banks and lenders hold millions of customers and leads, but outreach is manual, 
 5. **Launch through a communication API**: the campaign never talks to a telephony provider. It calls a reusable communication service, which calls Bolna.
 6. **Capture outcomes**: status timeline, transcript and structured fields land in Interaction History.
 
-## Why Bolna &nbsp;<picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/bolna-logo-white.png"><img alt="Bolna Logo" src="docs/assets/bolna-logo-dark.png" height="28" align="center" style="vertical-align: middle;"></picture>
+## Why Bolna &nbsp;<picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/bolna-logo-white.png"><img alt="Bolna Logo" src="docs/assets/bolna-logo-dark.png" height="28" style="vertical-align: middle;"></picture>
 
 TARA decides who to call, for which product, and what to say. Bolna is the voice engine that makes the call. We chose Bolna because it let us spend the build time on the lending workflow instead of audio plumbing.
 
-| What we needed | What Bolna gave us &nbsp;<picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/bolna-logo-white.png"><img alt="Bolna" src="docs/assets/bolna-logo-dark.png" height="15" align="center" style="vertical-align: middle;"></picture> | How TARA uses it |
+| What we needed | What Bolna gave us &nbsp;<picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/bolna-logo-white.png"><img alt="Bolna" src="docs/assets/bolna-logo-dark.png" height="18" style="vertical-align: middle;"></picture> | How TARA uses it |
 |---|---|---|
 | Indian languages on a real phone call | Hindi and Telugu with mid-call language switching, plus Sarvam speech models that can be connected on your own account | The agent opens in a customer's stored language and followed the caller from Hindi into Telugu in a real test call |
 | One agent, many campaigns | Per-call dynamic variables (`user_data`) that fill the agent prompt and welcome message | One Bolna agent serves every campaign. Each campaign's objective, questions, tone and opening line are sent as variables, so prompts are configuration, not code |
